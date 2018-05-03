@@ -32,10 +32,11 @@ def decode_framegroups(framegoups):
         file.write('latitude,longitude,timestamp')
         file.write(os.linesep)
         for group in framegoups:
-            file.write(','.join(str(value) for value in get_if_coord(group)))
+            if_coord = get_if_coord(group)
+            file.write(','.join(str(value) for value in if_coord))
             file.write(os.linesep)
             for i in range((len(group) - 4) / 2):
-                pf_coord = get_pf_coord(group, i)
+                pf_coord = get_pf_coord(group, i, if_coord)
                 if (pf_coord is not None):
                     file.write(','.join(str(value) for value in pf_coord))
                     file.write(os.linesep)
@@ -47,13 +48,12 @@ def get_if_coord(framegroup):
 
     return (lat, lon, timestamp)
 
-def get_pf_coord(framegroup, index):
-    frame_if = get_if_coord(framegroup)
+def get_pf_coord(framegroup, index, framegroup_if):
     pf_index = 4 + index
-    timestamp = frame_if[2] + (index + 1) * 30
+    timestamp = framegroup_if[2] + (index + 1) * 30
     if (framegroup[pf_index] is not None and framegroup[pf_index + 1] is not None):
-        lat = frame_if[0] + framegroup[pf_index + 1]
-        lon = frame_if[1] + framegroup[pf_index]
+        lat = framegroup_if[0] + framegroup[pf_index + 1]
+        lon = framegroup_if[1] + framegroup[pf_index]
         return (lat, lon, timestamp)
     else:
         return None
