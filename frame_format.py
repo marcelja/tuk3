@@ -80,7 +80,7 @@ def worker_thread(ids, begin, end):
                     counter += 1
 
             line.append(str(round(ifx - row[0], 6)))
-            line.append(str(round(ify - row[1], 4)))
+            line.append(str(round(ify - row[1], 6)))
             counter += 1
 
         _write_line_to_file(_fill_line(line), filename)
