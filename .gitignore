@@ -1,0 +1,5 @@
+.vscode
+_local
+
+config.json
+*.csv
