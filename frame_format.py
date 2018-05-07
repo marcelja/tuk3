@@ -69,8 +69,8 @@ def worker_thread(ids, begin, end):
                         line.append('')
                         counter += 1
 
-                line.append(str(round(ifx - row[0], 6)))
-                line.append(str(round(ify - row[1], 6)))
+                line.append(str(round(row[0] - ifx, 6)))
+                line.append(str(round(row[1] - ify, 6)))
                 counter += 1
 
             _write_line_to_file(_fill_line(line), filename)
@@ -80,7 +80,7 @@ def worker_thread(ids, begin, end):
 def _fill_line(line):
     """Add missing information at the end of a time frame to the line."""
     # Length must be 244: TID, FGCID, IFX, IFY, 2*120
-    while len(line) < 244:
+    while len(line) < 84:
         line.append('')
         line.append('')
     return line

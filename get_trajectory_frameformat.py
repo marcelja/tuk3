@@ -18,7 +18,7 @@ def main():
 
 def get_trajectory():
     with Cursor(SCHEMA_NAME) as cursor:
-        cursor.execute('SELECT * FROM TUK3_TS_MJ.FRAMEFORMAT_NEW WHERE TID={} ORDER BY FGCID'.format(TID))
+        cursor.execute('SELECT * FROM TUK3_TS_MJ.FRAMEFORMAT2 WHERE TID={} ORDER BY FGCID'.format(TID))
         framegroups = cursor.fetchall()
     decode_framegroups(framegroups)
 
@@ -47,7 +47,7 @@ def get_if_coord(framegroup):
 
 
 def get_pf_coord(framegroup, index, framegroup_if):
-    pf_index = 4 + index
+    pf_index = 4 + 2 * index
     timestamp = framegroup_if[2] + (index + 1) * 30
     if (framegroup[pf_index] is not None and framegroup[pf_index + 1] is not None):
         lat = framegroup_if[0] + framegroup[pf_index + 1]
