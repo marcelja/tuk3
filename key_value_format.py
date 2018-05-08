@@ -7,7 +7,6 @@ from cursor import Cursor
 SCHEMA_NAME = 'TUK3_TS_MJ'
 THREADS = 8
 
-
 def main():
     ids = get_ids()
     start_threads(ids)
@@ -34,7 +33,7 @@ def start_threads(ids):
 
 def worker_thread(ids, begin, end):
     with Cursor(SCHEMA_NAME) as cursor:
-        filename = 'kv-{}-{}.csv'.format(begin, end)
+        # filename = 'kv-{}-{}.csv'.format(begin, end)
         while begin <= end:
             # Result is tuple
             current_id = ids[begin][0]
@@ -43,7 +42,7 @@ def worker_thread(ids, begin, end):
             data = cursor.fetchall()
             
             line = []
-            line.append(str(current_id))
+            line.append(current_id)
             trajectory = []
             start_time = data[0][1]
             end_time = data[0][1]
@@ -75,15 +74,26 @@ def worker_thread(ids, begin, end):
                 if lon > mbr[3]:
                     mbr[3] = lon
 
-            line.append(json.dumps(trajectory))
+            line.append(json.dumps(trajectory).replace(' ', ''))
             line.append(str(start_time))
             line.append(str(end_time))
-            line.append(json.dumps(mbr))
-            write_line_to_file(line, filename)
+            line.append(json.dumps(mbr).replace(' ', ''))
+            statement = "INSERT INTO KEY_VALUE(ID, OBJ, ST, ET, MBR) VALUES({}, '', '{}', '{}', '{}')".format(line[0], line[2], line[3], line[4])
+            cursor.execute(statement)
+
+            MAX_NCLOB_LENGTH = 128000
+            # split OBJ string up in parts of MAX_NCLOB_LNGTH size and update column iteratively
+            # MAX_NCLOB_LNGTH is a current restriction of pyhdb
+            for i in range((len(line[1]) / MAX_NCLOB_LENGTH) + 1):
+                part = line[1][i * MAX_NCLOB_LENGTH:(i + 1) * MAX_NCLOB_LENGTH - 1]
+                update_statement = "UPDATE KEY_VALUE SET OBJ=CONCAT(OBJ, '{}') WHERE ID={}".format(part, line[0])
+                cursor.execute(update_statement)
+
+            cursor.connection.commit()
             begin += 1
 
 def write_line_to_file(line, filename):
-    joined = "|".join(line)
+    joined = ";".join(line)
     with open(filename, 'a') as file:
         file.write(joined)
         file.write(os.linesep)
