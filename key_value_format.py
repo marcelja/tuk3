@@ -74,7 +74,7 @@ def worker_thread(ids, begin, end):
                 if lon > mbr[3]:
                     mbr[3] = lon
 
-            line.append(json.dumps(trajectory).replace(' ', ''))
+            line.append(json.dumps(trajectory).replace(', ', ','))
             line.append(str(start_time))
             line.append(str(end_time))
             line.append(json.dumps(mbr).replace(' ', ''))
