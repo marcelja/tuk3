@@ -6,7 +6,7 @@ create procedure locations_at_timeframe(in fgcidin int, in colnumber int, out ou
 LANGUAGE SQLSCRIPT AS
  BEGIN 
 
-declare lon, lat nvarchar(5);
+declare lon, lat nvarchar(7);
 
 CREATE LOCAL TEMPORARY TABLE #TEMPTABLE (lat float(9), lon float(9));
 
