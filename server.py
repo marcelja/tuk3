@@ -18,7 +18,7 @@ def timeframe(fgcid, frame):
         cursor.execute('call locations_at_timeframe({}, {}, ?)'
                        .format(fgcid, frame))
         # TODO: adapt return type
-        return str(cursor.fetchall())
+        return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
 
 
 @app.route('/timeframe_granularity/<int:fgcid>/<int:frame>/<int:granularity>')
