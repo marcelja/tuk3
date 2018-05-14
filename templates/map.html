@@ -31,12 +31,12 @@
         width: 26em;
         margin: 0 auto;
       }
-      #time-slider {
+      #time-slider, #granularity-slider {
         width: 25em;
         position: relative;
         line-height: 1;
       }
-      #slider {
+      .slider {
         width: 90%;
       }
     </style>
@@ -49,8 +49,12 @@
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button>
       <div id="time-slider">
-        <div id="slider-label">0 h</div>
-        <input id="slider" type="range" value="0" min="0" max="23" step="1">
+        <div class="slider-label">0 h</div>
+        <input class="slider" type="range" value="0" min="0" max="23" step="1">
+      </div>
+      <div id="granularity-slider">
+        <div class="slider-label">Granularity: 6</div>
+        <input class="slider" type="range" value="6" min="0" max="6" step="1">
       </div>
     </div>
     <div id="map"></div>

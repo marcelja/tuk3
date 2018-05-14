@@ -10,23 +10,30 @@ window.onload = function() {
 }
 
 function initSlider() {
-  let slider = $('#slider');
-  slider.on('input', () => {
+  let timeSlider = $('#time-slider .slider');
+  let granularitySlider = $('#granularity-slider .slider');
+  timeSlider.on('input', () => {
     onSliderChanged();
   });
-  slider.val(0);
+  granularitySlider.on('input', () => {
+    onSliderChanged();
+  });
+  timeSlider.val(0);
+  granularitySlider.val(6);
   onSliderChanged();
 }
 
 function onSliderChanged() {
-  let value = parseInt($('#slider').val());
-
+  let timeValue = parseInt($('#time-slider .slider').val());
+  let granularityValue = parseInt($('#granularity-slider .slider').val());
+  
   // update label
-  $('#slider-label').text(value + ' h');
+  $('#time-slider .slider-label').text(timeValue + ' h');
+  $('#granularity-slider .slider-label').text('Granularity: ' + granularityValue);
 
   // get data
-  let frame = value * 6; // each frame is 10 minutes
-  $.getJSON('/timeframe/' + frame + '/0', (data) => {
+  let frame = timeValue * 6; // each frame is 10 minutes
+  $.getJSON('/timeframe_granularity/' + frame + '/0/' + granularityValue, (data) => {
     let heatmapData = formatHeatmapData(data);
     heatmap.setData(heatmapData);
   });
@@ -34,7 +41,7 @@ function onSliderChanged() {
 
 function formatHeatmapData(rawData) {
   return rawData.map((point) => {
-    return {location: new google.maps.LatLng(point[0], point[1])}
+    return {location: new google.maps.LatLng(point[0], point[1]), weight: point[2]}
   })
 }
 
