@@ -22,7 +22,7 @@ def get_trajectory():
     with Cursor(SCHEMA_NAME) as cursor:
         cursor.execute('SELECT * FROM TUK3_TS_MJ.SHENZHEN WHERE ID={} ORDER BY TIMESTAMP'.format(TID))
         points = cursor.fetchall()
-    decode_framegroups(points)
+        decode_framegroups(points)
 
 
 def decode_framegroups(points):
