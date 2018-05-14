@@ -9,7 +9,7 @@ node_modules/
 package-lock.json
 
 # google api key
-map/api_key.json
+api_key.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
