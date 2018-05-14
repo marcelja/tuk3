@@ -4,10 +4,48 @@
 
 var map, heatmap;
 
+window.onload = function() {
+  loadScript();
+  initSlider();
+}
+
+function initSlider() {
+  let slider = $('#slider');
+  slider.on('input', () => {
+    onSliderChanged();
+  });
+  slider.val(0);
+  onSliderChanged();
+}
+
+function onSliderChanged() {
+  let value = parseInt($('#slider').val());
+
+  // update label
+  $('#slider-label').text(value + ' h');
+
+  // get data
+  let frame = value * 6; // each frame is 10 minutes
+  $.getJSON('/timeframe/' + frame + '/0', (data) => {
+    let heatmapData = formatHeatmapData(data);
+    heatmap.setData(heatmapData);
+  });
+}
+
+function formatHeatmapData(rawData) {
+  return rawData.map((point) => {
+    return {location: new google.maps.LatLng(point[0], point[1])}
+  })
+}
+
 function initMap() {
+  let shenzhenCoords = {
+    lat: 22.5497519,
+    lng: 113.9824022
+  }
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 13,
-    center: {lat: 37.775, lng: -122.434},
+    zoom: 12,
+    center: shenzhenCoords,
     mapTypeId: 'satellite'
   });
 
@@ -70,12 +108,10 @@ function getPoints() {
 }
 
 function loadScript() {
-  $.getJSON("api_key.json", function(json) {
+  $.getJSON("static/api_key.json", function(json) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = 'https://maps.googleapis.com/maps/api/js?key=' + json['api_key'] + '&libraries=visualization&callback=initMap';
     document.body.appendChild(script);
   });
 }
-
-window.onload = loadScript;
