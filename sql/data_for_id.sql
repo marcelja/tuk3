@@ -1,3 +1,7 @@
+drop type id_infos;
+create type id_infos as table (lon float(7), lat float(7), fgcid int, frame int);
+
+
 drop  procedure data_for_id;
     create procedure data_for_id(in id int , out OUTPUT_TABLE "TUK3_TS_MJ"."ID_INFOS" )
 LANGUAGE SQLSCRIPT AS
