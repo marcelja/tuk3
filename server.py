@@ -54,6 +54,20 @@ def trajectory_frame(tid):
         return Response(json.dumps(result), mimetype='application/json')
 
 
+@app.route('/trajectory_keyvalue/<int:tid>')
+def trajectory_keyvalue(tid):
+    # Must be in range 22223 <= TID <= 36950
+    with Cursor(SCHEMA_NAME) as cursor:
+        query = '''select obj from "TUK3_TS_MJ"."KEY_VALUE"
+                   where id = {}'''.format(tid)
+        cursor.execute(query)
+        result_tuple = cursor.fetchone()
+        # tuple contains only one selected value
+        trajectory_object = result_tuple[0].read()
+        return Response(json.dumps(json.loads(trajectory_object)),
+                        mimetype='application/json')
+
+
 @app.route('/timeframe/<int:fgcid>/<int:frame>')
 def timeframe(fgcid, frame):
     with Cursor(SCHEMA_NAME) as cursor:
