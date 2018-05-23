@@ -28,13 +28,12 @@ function onSliderChanged() {
   let granularityValue = parseInt($('#granularity-slider .slider').val());
   
   // update label
-  $('#time-slider .slider-label').text(timeValue + ' h');
+  $('#time-slider .slider-label').text('⌚  ' + Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   $('#granularity-slider .slider-label').text('Granularity: ' + granularityValue);
 
   // get data
   let startTime = new Date().getTime();
-  let frame = timeValue * 6; // each frame is 10 minutes
-  $.getJSON('/timeframe_granularity/' + frame + '/0/' + granularityValue, (data) => {
+  $.getJSON('/timeframe_granularity/' + timeValue + '/0/' + granularityValue, (data) => {
     let loadingTime = new Date().getTime() - startTime;
     $('#loadingTime').text(loadingTime + ' ms');
     let heatmapData = formatHeatmapData(data);
