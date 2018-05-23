@@ -18,13 +18,13 @@ def main():
 
 def get_trajectory():
     with Cursor(SCHEMA_NAME) as cursor:
-        cursor.execute('SELECT * FROM TUK3_TS_MJ.FRAMEFORMAT2 WHERE TID={} ORDER BY FGCID'.format(TID))
+        cursor.execute('SELECT * FROM TUK3_TS_MJ.FRAMEFORMAT_NEW WHERE TID={} ORDER BY FGCID'.format(TID))
         framegroups = cursor.fetchall()
     decode_framegroups(framegroups)
 
 
 def decode_framegroups(framegoups):
-    with open('{}_frameformat.csv'.format(TID), 'w') as file:
+    with open('{}_frameformat_30.csv'.format(TID), 'w') as file:
         file.write('latitude,longitude,timestamp')
         file.write(os.linesep)
         for group in framegoups:

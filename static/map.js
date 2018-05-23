@@ -3,6 +3,7 @@
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
 var map, heatmap;
+var play = false;
 
 window.onload = function() {
   loadScript();
@@ -28,18 +29,41 @@ function onSliderChanged() {
   let granularityValue = parseInt($('#granularity-slider .slider').val());
   
   // update label
-  $('#time-slider .slider-label').text(timeValue + ' h');
+  $('#time-slider .slider-label').text('⌚  ' + Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   $('#granularity-slider .slider-label').text('Granularity: ' + granularityValue);
 
   // get data
   let startTime = new Date().getTime();
-  let frame = timeValue * 6; // each frame is 10 minutes
-  $.getJSON('/timeframe_granularity/' + frame + '/0/' + granularityValue, (data) => {
+  $.getJSON('/timeframe_granularity/' + timeValue + '/0/' + granularityValue, (data) => {
     let loadingTime = new Date().getTime() - startTime;
     $('#loadingTime').text(loadingTime + ' ms');
     let heatmapData = formatHeatmapData(data);
     heatmap.setData(heatmapData);
   });
+}
+
+function autoPlay() {
+  play = !play;
+  let timeValue = parseInt($('#time-slider .slider').val());
+  runLoop(timeValue);
+}
+
+function runLoop(timeValue) {
+  timeValue = (timeValue + 1) % 143;
+  $('#time-slider .slider-label').text('⌚  ' + Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
+  let granularityValue = parseInt($('#granularity-slider .slider').val());
+  document.getElementsByClassName('slider')[0].value = timeValue;
+
+  setTimeout(function(){
+
+    $.getJSON('/timeframe_granularity/' + timeValue + '/0/' + granularityValue, (data) => {
+      let heatmapData = formatHeatmapData(data);
+      heatmap.setData(heatmapData);
+    });
+
+  if (play) runLoop(timeValue);
+  }, 300);
+
 }
 
 function formatHeatmapData(rawData) {

@@ -3,7 +3,7 @@ from flask import Flask, render_template, Response
 import json
 import datetime
 import time
-
+import re
 
 app = Flask(__name__)
 
@@ -110,8 +110,29 @@ def route_information(tid):
         cursor.execute(query)
         result = cursor.fetchall()
         
-        # import pdb;pdb.set_trace()
         return Response(json.dumps([(x[0].strftime("%H:%M:%S"),x[1],x[2],x[3]) for x in result]), mimetype='application/json')
+
+@app.route('/key_value/<int:hour>')
+def key_value(hour):
+    with Cursor(SCHEMA_NAME) as cursor:
+        results = []
+        query = '''select OBJ from KEY_VALUE where 
+                        ST <= to_timestamp('01.01.0001 {0}:00:00', 'dd.mm.yyyy hh24:mi:ss') 
+                        AND ET >= to_timestamp('01.01.0001 {0}:00:00', 'dd.mm.yyyy hh24:mi:ss')
+                '''.format(hour)
+        cursor.execute(query)
+        # all = cursor.fetchall()
+        # return str(all[0][0].read(all[0][0].length))
+
+        regex = r'.*\["\d{4}-\d{2}-\d{2} ' + '{0:0>2}'.format(hour) + ':00:[0-5][0-9]",(\d{2,3}\.\d{1,6}),(\d{2,3}\.\d{1,6})\].*'
+        print("matching {}".format(regex))
+        for trajectory in cursor.fetchall():
+            full_trajectory = trajectory[0].read(trajectory[0].length)
+            match = re.match(regex, full_trajectory, re.M|re.I)
+            if match:
+                results.append([float(match.group(1)), float(match.group(2)), 1])
+        print("matched")
+        return Response(json.dumps(results), mimetype='application/json')
 
 
 def _convert_timestamp(ts):
