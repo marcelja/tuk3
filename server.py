@@ -43,6 +43,20 @@ def timeframe_granularity(fgcid, frame, granularity):
         cursor.execute(query)
         return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
 
+@app.route('/route/<int:tid>')
+def route_information(tid):
+    with Cursor(SCHEMA_NAME) as cursor:
+        query = '''select timestamp,lon,lat,occupancy
+                        from shenzhen
+                        where id='{}' order by timestamp
+                '''.format(tid)
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+        
+        # import pdb;pdb.set_trace()
+        return Response(json.dumps([(x[0].strftime("%H:%M:%S"),x[1],x[2],x[3]) for x in result]), mimetype='application/json')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=9001)
