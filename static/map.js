@@ -32,8 +32,11 @@ function onSliderChanged() {
   $('#granularity-slider .slider-label').text('Granularity: ' + granularityValue);
 
   // get data
+  let startTime = new Date().getTime();
   let frame = timeValue * 6; // each frame is 10 minutes
   $.getJSON('/timeframe_granularity/' + frame + '/0/' + granularityValue, (data) => {
+    let loadingTime = new Date().getTime() - startTime;
+    $('#loadingTime').text(loadingTime + ' ms');
     let heatmapData = formatHeatmapData(data);
     heatmap.setData(heatmapData);
   });

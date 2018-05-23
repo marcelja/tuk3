@@ -28,16 +28,21 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         line-height: 30px;
         padding-left: 10px;
-        width: 26em;
+        width: 51em;
         margin: 0 auto;
       }
       #time-slider, #granularity-slider {
         width: 25em;
         position: relative;
         line-height: 1;
+        display: inline-block;
       }
       .slider {
         width: 90%;
+      }
+      #loadingTimeContainer {
+        margin-left: 1em;
+        display: inline;
       }
     </style>
   </head>
@@ -48,6 +53,9 @@
       <button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button>
+      <div id="loadingTimeContainer">
+        Time: <span id="loadingTime"></span>
+      </div>
       <div id="time-slider">
         <div class="slider-label">0 h</div>
         <input class="slider" type="range" value="0" min="0" max="23" step="1">
