@@ -109,7 +109,9 @@ def timeframe_points(fgcid, frame):
         cursor.execute(query)
         end = datetime.datetime.now()
         print('Frame point format: {} us'.format((end - start).microseconds))
-        return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
+        return Response(json.dumps(cursor.fetchall(),
+                                   default=_convert_timestamp),
+                        mimetype='application/json')
 
 
 @app.route('/timeframe_granularity/<int:fgcid>/<int:frame>/<int:granularity>')
