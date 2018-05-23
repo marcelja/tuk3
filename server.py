@@ -1,15 +1,57 @@
 from cursor import Cursor
 from flask import Flask, render_template, Response
 import json
+import datetime
+import time
+
 
 app = Flask(__name__)
 
 SCHEMA_NAME = 'TUK3_TS_MJ'
+FRAME_SIZE = 15  # seconds
+FRAME_GROUP_SIZE = 10  # minutes
 
 
 @app.route('/')
-def index():   
+def index():
     return render_template('map.html')
+
+
+@app.route('/trajectory_point/<int:tid>')
+def trajectory_point(tid):
+    # Must be in range 22223 <= TID <= 36950
+    with Cursor(SCHEMA_NAME) as cursor:
+        query = '''select lat, lon, timestamp
+                   from "TAXI"."SHENZHEN"
+                   where id = {}
+                   order by timestamp'''.format(tid)
+        cursor.execute(query)
+        return Response(json.dumps(cursor.fetchall(),
+                                   default=_convert_timestamp),
+                        mimetype='application/json')
+
+
+@app.route('/trajectory_frame/<int:tid>')
+def trajectory_frame(tid):
+    # Must be in range 22223 <= TID <= 36950
+    with Cursor(SCHEMA_NAME) as cursor:
+        # Layout: tid, fgcid, ifx, ify, pf0px, pf0py, ...
+        query = '''select * from "TUK3_TS_MJ"."FRAMEFORMAT2"
+                   where tid = {}
+                   order by fgcid'''.format(tid)
+        cursor.execute(query)
+        query_result = cursor.fetchall()
+        result = []
+        for framegroup in query_result:
+            ifx = framegroup[2]
+            ify = framegroup[3]
+            for frame in range(int(60 / FRAME_SIZE) * FRAME_GROUP_SIZE):
+                index = 4 + 2 * frame
+                if framegroup[index] is not None:
+                    result.append([framegroup[index + 1] + ify,
+                                   framegroup[index] + ifx,
+                                   _get_timestamp(framegroup[1], frame)])
+        return Response(json.dumps(result), mimetype='application/json')
 
 
 @app.route('/timeframe/<int:fgcid>/<int:frame>')
@@ -42,6 +84,16 @@ def timeframe_granularity(fgcid, frame, granularity):
 
         cursor.execute(query)
         return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
+
+
+def _convert_timestamp(ts):
+    if isinstance(ts, datetime.datetime):
+        return str(ts)
+
+
+def _get_timestamp(fgcid, frame):
+    seconds = fgcid * FRAME_GROUP_SIZE * 60 + frame * FRAME_SIZE
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(seconds))
 
 
 if __name__ == '__main__':
