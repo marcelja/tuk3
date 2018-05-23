@@ -141,9 +141,24 @@ function getPoints() {
   ];
 }
 
+function calculateTimeDifference(startTime, endTime) {
+  var start = startTime.split(":");
+  var end = endTime.split(":");
+  var startMin = Number(start[0]) * 60 + Number(start[1]);
+  var endMin = Number(end[0]) * 60 + Number(end[1]);
+  return endMin - startMin;
+}
+
 function addInformation(position, startTime, endTime, distance) {
+  var diff = calculateTimeDifference(startTime, endTime);
+  var km = Math.round(2.4*distance/1000);
+  var waiting = Math.round(diff * 0.1 / 60 * 48);
+
   var infowindow = new google.maps.InfoWindow({
-    content: `start: ${startTime}, end: ${endTime}<br>distance: ${Math.round(distance/100)/10} km`
+    content: `start: ${startTime}, 
+    end: ${endTime}<br>distance: ${Math.round(distance/100)/10} km<br>
+    est. price: 11.00¥ + ${km}¥ (km) + ${waiting}¥ (waiting) 
+    = ${11+km+waiting}¥`
   });
   var marker = new google.maps.Marker({
     position: position,
@@ -213,7 +228,7 @@ function loadScript() {
     document.body.appendChild(script);
     // wait for google script to load
     setTimeout(function(){
-      drawRoute(22223);
+      // drawRoute(22223);
     }, 2000);
   });
 }
