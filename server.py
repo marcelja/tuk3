@@ -94,6 +94,24 @@ def timeframe(fgcid, frame):
         return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
 
 
+@app.route('/timeframe_points/<int:fgcid>/<int:frame>')
+def timeframe_points(fgcid, frame):
+    with Cursor(SCHEMA_NAME) as cursor:
+        # THIS METHOD IS FOR PERFORMANCE MEASUREMENTS ONLY !
+        # QUERY IS HARDCODED !
+        start = datetime.datetime.now()
+        query = '''select * from "TAXI"."SHENZHEN"
+                   where hour(timestamp) = 0
+                   and minute(timestamp) = 0
+                   and second(timestamp) < 15
+                   and second(timestamp) >= 0'''
+
+        cursor.execute(query)
+        end = datetime.datetime.now()
+        print('Frame point format: {} us'.format((end - start).microseconds))
+        return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
+
+
 @app.route('/timeframe_granularity/<int:fgcid>/<int:frame>/<int:granularity>')
 def timeframe_granularity(fgcid, frame, granularity):
     # Granularity is supposed to be >= 0 and < 7
