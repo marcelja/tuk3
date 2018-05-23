@@ -21,11 +21,14 @@ def index():
 def trajectory_point(tid):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
+        start = datetime.datetime.now()
         query = '''select lat, lon, timestamp
                    from "TAXI"."SHENZHEN"
                    where id = {}
                    order by timestamp'''.format(tid)
         cursor.execute(query)
+        end = datetime.datetime.now()
+        print('Whole trajectory point format: {} us'.format((end - start).microseconds))
         return Response(json.dumps(cursor.fetchall(),
                                    default=_convert_timestamp),
                         mimetype='application/json')
@@ -36,6 +39,7 @@ def trajectory_frame(tid):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
         # Layout: tid, fgcid, ifx, ify, pf0px, pf0py, ...
+        start = datetime.datetime.now()
         query = '''select * from "TUK3_TS_MJ"."FRAMEFORMAT2"
                    where tid = {}
                    order by fgcid'''.format(tid)
@@ -51,6 +55,8 @@ def trajectory_frame(tid):
                     result.append([framegroup[index + 1] + ify,
                                    framegroup[index] + ifx,
                                    _get_timestamp(framegroup[1], frame)])
+        end = datetime.datetime.now()
+        print('Whole trajectory frame format: {} us'.format((end - start).microseconds))
         return Response(json.dumps(result), mimetype='application/json')
 
 
@@ -58,12 +64,15 @@ def trajectory_frame(tid):
 def trajectory_keyvalue(tid):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
+        start = datetime.datetime.now()
         query = '''select obj from "TUK3_TS_MJ"."KEY_VALUE"
                    where id = {}'''.format(tid)
         cursor.execute(query)
         result_tuple = cursor.fetchone()
         # tuple contains only one selected value
         trajectory_object = result_tuple[0].read()
+        end = datetime.datetime.now()
+        print('Whole trajectory kv format: {} us'.format((end - start).microseconds))
         return Response(json.dumps(json.loads(trajectory_object)),
                         mimetype='application/json')
 
@@ -71,6 +80,7 @@ def trajectory_keyvalue(tid):
 @app.route('/timeframe/<int:fgcid>/<int:frame>')
 def timeframe(fgcid, frame):
     with Cursor(SCHEMA_NAME) as cursor:
+        start = datetime.datetime.now()
         lat = 'PF{}PX'.format(frame)
         lon = 'PF{}PY'.format(frame)
         query = '''select {0} + ify as lat, {1} + ifx as lon
@@ -79,6 +89,8 @@ def timeframe(fgcid, frame):
                    and {0} is not NULL'''.format(lat, lon, fgcid)
 
         cursor.execute(query)
+        end = datetime.datetime.now()
+        print('Frame frame format: {} us'.format((end - start).microseconds))
         return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
 
 
@@ -99,9 +111,11 @@ def timeframe_granularity(fgcid, frame, granularity):
         cursor.execute(query)
         return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
 
+
 @app.route('/key_value/<int:hour>')
 def key_value(hour):
     with Cursor(SCHEMA_NAME) as cursor:
+        start = datetime.datetime.now()
         results = []
         query = '''select OBJ from KEY_VALUE where 
                         ST <= to_timestamp('01.01.0001 {0}:00:00', 'dd.mm.yyyy hh24:mi:ss') 
@@ -119,6 +133,8 @@ def key_value(hour):
             if match:
                 results.append([float(match.group(1)), float(match.group(2)), 1])
         print("matched")
+        end = datetime.datetime.now()
+        print('Frame kv format: {} us'.format((end - start).microseconds))
         return Response(json.dumps(results), mimetype='application/json')
 
 
