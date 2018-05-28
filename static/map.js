@@ -212,6 +212,10 @@ function addPolyline(coordinates, occupancy, startTime, endTime) {
 }
 
 function drawRoute(id) {
+  if (!id) {
+    return;
+  }
+  
   $.getJSON('/route/' + id, (routeData) => {
     if (routeData.length <= 2) {
       return;
