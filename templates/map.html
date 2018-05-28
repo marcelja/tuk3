@@ -55,6 +55,8 @@
       <button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button>
+      <input id="input-trajectory" type="number" placeholder="Trajectory ID" onkeypress="onInputTrajectoryKeypress(event)">
+      <button onclick="onDrawRouteClick()">Draw Route</button>
       <div id="loadingTimeContainer">
         Time: <span id="loadingTime"></span>
       </div>

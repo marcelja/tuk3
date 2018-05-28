@@ -2,7 +2,7 @@
 // parameter when you first load the API. For example:
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
-var map, heatmap;
+var map, heatmap, paths = [], markers = [];
 var play = false;
 
 window.onload = function() {
@@ -141,6 +141,19 @@ function getPoints() {
   ];
 }
 
+function onInputTrajectoryKeypress(event) {
+  let enterCode = 13;
+  if (event.charCode === enterCode) {
+    let trajectoryId = parseInt(event.target.value);
+    drawRoute(trajectoryId);
+  }
+}
+
+function onDrawRouteClick() {
+  let trajectoryId = parseInt($('#input-trajectory').val());
+  drawRoute(trajectoryId);
+}
+
 function calculateTimeDifference(startTime, endTime) {
   var start = startTime.split(":");
   var end = endTime.split(":");
@@ -168,6 +181,7 @@ function addInformation(position, startTime, endTime, distance) {
   marker.addListener('click', function() {
     infowindow.open(map, marker);
   });
+  markers.push(marker);
 }
 
 function addPolyline(coordinates, occupancy, startTime, endTime) {
@@ -194,6 +208,7 @@ function addPolyline(coordinates, occupancy, startTime, endTime) {
   }
 
   path.setMap(map);
+  paths.push(path);
 }
 
 function drawRoute(id) {
@@ -201,6 +216,7 @@ function drawRoute(id) {
     if (routeData.length <= 2) {
       return;
     }
+    clearPaths();
     var occupancy = null;
     var startTime = routeData[0][0];
     var endTime;
@@ -217,6 +233,19 @@ function drawRoute(id) {
       coordinates.push({lat: routeData[i][2], lng: routeData[i][1]});
     }
   });
+}
+
+function clearPaths() {
+  for (let marker of markers) {
+    marker.setMap(null)
+    marker = null;
+  }
+  markers = [];
+  for (let path of paths) {
+    path.setMap(null);
+    path = null;
+  }
+  markers = [];
 }
 
 function loadScript() {
