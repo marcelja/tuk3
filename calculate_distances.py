@@ -5,7 +5,7 @@ import geopy.distance
 
 
 SCHEMA_NAME = 'TUK3_TS_MJ'
-THREADS = 8
+THREADS = 32
 
 
 def main():
@@ -44,7 +44,11 @@ def worker_thread(ids, begin, end):
             # print('Working on id {}'.format(current_id))
             cursor.execute('select seconds, lon, lat, occupancy from shenzhen_seconds where id={} order by seconds'.format(current_id))
             data = cursor.fetchall()
-            _calculate_total_distance(data, current_id, cursor)
+
+            try:
+                _calculate_total_distance(data, current_id, cursor)
+            except:
+                print(current_id, "failed")
 
             if counter % 50 == 0:
                 print('worker {}: {}%'.format(begin, round((counter-begin)/(end-begin),1)))
