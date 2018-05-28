@@ -54,6 +54,7 @@ def worker_thread(ids, begin, end):
                 print('worker {}: {}%'.format(begin, round((counter-begin)*100/(end-begin),1)))
 
             counter += 1
+        print('worker {}: 100.0%'.format(begin))
 
 
 def _calculate_total_distance(data, current_id, cursor):
