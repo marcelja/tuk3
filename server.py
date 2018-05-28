@@ -109,8 +109,7 @@ def route_information(tid):
 
         cursor.execute(query)
         result = cursor.fetchall()
-        
-        return Response(json.dumps([(x[0].strftime("%H:%M:%S"),x[1],x[2],x[3]) for x in result]), mimetype='application/json')
+        return Response(json.dumps([('{0.hour:02d}:{0.minute:02d}:{0.second:02d}'.format(x[0]),x[1],x[2],x[3]) for x in result]), mimetype='application/json')
 
 @app.route('/key_value/<int:hour>')
 def key_value(hour):
