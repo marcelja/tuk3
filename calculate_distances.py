@@ -5,7 +5,7 @@ import geopy.distance
 
 
 SCHEMA_NAME = 'TUK3_TS_MJ'
-THREADS = 32
+THREADS = 8
 
 
 def main():
@@ -51,7 +51,7 @@ def worker_thread(ids, begin, end):
                 print(current_id, "failed")
 
             if counter % 50 == 0:
-                print('worker {}: {}%'.format(begin, round((counter-begin)/(end-begin),1)))
+                print('worker {}: {}%'.format(begin, round((counter-begin)*100/(end-begin),1)))
 
             counter += 1
 
