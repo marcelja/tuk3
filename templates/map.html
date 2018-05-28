@@ -50,7 +50,7 @@
 
   <body>
     <div id="floating-panel">
-      <button onclick="autoPlay()">Play</button>
+      <button onclick="autoPlay()">▶</button>
       <button onclick="toggleHeatmap()">Toggle Heatmap</button>
       <button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
@@ -58,10 +58,10 @@
       <input id="input-trajectory" type="number" placeholder="Trajectory ID" onkeypress="onInputTrajectoryKeypress(event)">
       <button onclick="onDrawRouteClick()">Draw Route</button>
       <div id="loadingTimeContainer">
-        Time: <span id="loadingTime"></span>
+        ⏱ <span id="loadingTime"></span>
       </div>
       <div id="time-slider">
-        <div class="slider-label">0 h</div>
+        <div class="slider-label">⌚ <span id="time-frame">00:00</span></div>
         <input class="slider" type="range" value="0:00" min="0" max="143" step="1">
       </div>
       <div id="granularity-slider">

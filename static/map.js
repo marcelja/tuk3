@@ -29,7 +29,7 @@ function onSliderChanged() {
   let granularityValue = parseInt($('#granularity-slider .slider').val());
   
   // update label
-  $('#time-slider .slider-label').text('⌚  ' + Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
+  $('#time-frame').text(Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   $('#granularity-slider .slider-label').text('Granularity: ' + granularityValue);
 
   // get data
@@ -50,7 +50,7 @@ function autoPlay() {
 
 function runLoop(timeValue) {
   timeValue = (timeValue + 1) % 143;
-  $('#time-slider .slider-label').text('⌚  ' + Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
+  $('#time-frame').text(Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   let granularityValue = parseInt($('#granularity-slider .slider').val());
   document.getElementsByClassName('slider')[0].value = timeValue;
 
