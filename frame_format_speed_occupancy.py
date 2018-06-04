@@ -5,6 +5,8 @@ from cursor import Cursor
 
 SCHEMA_NAME = 'TUK3_TS_MJ'
 THREADS = 8
+FRAME_DURATION = 15
+POINTS_PER_FRAME_GROUP = 40
 
 
 def main():
@@ -38,7 +40,7 @@ def worker_thread(ids, begin, end):
             # Result is tuple
             current_id = ids[begin][0]
             print('Working on id {}'.format(current_id))
-            cursor.execute('call data_for_id_speed_occupancy({}, ?)'.format(current_id))
+            cursor.execute('call data_for_id_speed_occupancy({}, {}, {}, ?)'.format(current_id, FRAME_DURATION, POINTS_PER_FRAME_GROUP))
             data = cursor.fetchall()
 
             fgcid = -1
