@@ -214,10 +214,17 @@ function addPolyline(coordinates, occupancy, startTime, endTime) {
       repeat: '120px'
     }]
   });
+
   var distance = google.maps.geometry.spherical.computeLength(path.getPath());
   if (occupancy == 1) {
     // add a text with information about the price
-    addInformation(coordinates[coordinates.length - 1], startTime, endTime, distance)
+    var markerId = markers.length;
+    addInformation(coordinates[coordinates.length - 1], startTime, endTime, distance);
+
+    google.maps.event.addListener(path, 'click', function(h) {
+      // trigger click on marker for current path
+      google.maps.event.trigger(markers[markerId], 'click', {});
+    });
   }
 
   path.setMap(map);
