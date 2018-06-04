@@ -78,7 +78,6 @@ function initMap() {
   });
 
   heatmap = new google.maps.visualization.HeatmapLayer({
-    data: getPoints(),
     map: map
   });
 }
@@ -148,26 +147,6 @@ function changeOpacity() {
   heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
 }
 
-function getPoints() {
-  return [
-  {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
-  new google.maps.LatLng(37.782, -122.445),
-  {location: new google.maps.LatLng(37.782, -122.443), weight: 2},
-  {location: new google.maps.LatLng(37.782, -122.441), weight: 3},
-  {location: new google.maps.LatLng(37.782, -122.439), weight: 2},
-  new google.maps.LatLng(37.782, -122.437),
-  {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
-
-  {location: new google.maps.LatLng(37.785, -122.447), weight: 3},
-  {location: new google.maps.LatLng(37.785, -122.445), weight: 2},
-  new google.maps.LatLng(37.785, -122.443),
-  {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
-  new google.maps.LatLng(37.785, -122.439),
-  {location: new google.maps.LatLng(37.785, -122.437), weight: 2},
-  {location: new google.maps.LatLng(37.785, -122.435), weight: 3}
-  ];
-}
-
 function onInputTrajectoryKeypress(event) {
   let enterCode = 13;
   if (event.charCode === enterCode) {
@@ -200,10 +179,17 @@ function addInformation(position, startTime, endTime, distance) {
     est. price: 11.00¥ + ${km}¥ (km) + ${waiting}¥ (waiting) 
     = ${11+km+waiting}¥`
   });
+
+  var icon = {
+    url: "static/yuan.png",
+    scaledSize: new google.maps.Size(30, 30)
+  };
+
   var marker = new google.maps.Marker({
     position: position,
     map: map,
-    title: 'Taxi'
+    title: 'Taxi',
+    icon: icon
   });
   marker.addListener('click', function() {
     infowindow.open(map, marker);
