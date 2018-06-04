@@ -36,7 +36,10 @@ def trajectory_frame(tid):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
         # Layout: tid, fgcid, ifx, ify, pf0px, pf0py, ...
-        query = '''select * from "TUK3_TS_MJ"."FRAMEFORMAT2"
+        query = 'select tid, fgcid, ifx, ify'
+        for i in range(40):
+            query += ', pf0px, pf1px'
+        query += ''' from "TUK3_TS_MJ"."FRAME_FORMAT_15"
                    where tid = {}
                    order by fgcid'''.format(tid)
         cursor.execute(query)
@@ -74,7 +77,7 @@ def timeframe(fgcid, frame):
         lat = 'PF{}PX'.format(frame)
         lon = 'PF{}PY'.format(frame)
         query = '''select {0} + ify as lat, {1} + ifx as lon
-                   from "TUK3_TS_MJ"."FRAMEFORMAT2"
+                   from "TUK3_TS_MJ"."FRAME_FORMAT_15"
                    where fgcid = {2}
                    and {0} is not NULL'''.format(lat, lon, fgcid)
 
@@ -91,7 +94,7 @@ def timeframe_granularity(fgcid, frame, granularity):
         query = '''select lat, lon, count(*) as weight from (
                             select round({0} + ify, {1}) as lat,
                                    round({2} + ifx, {1}) as lon
-                            from "TUK3_TS_MJ"."FRAMEFORMAT2"
+                            from "TUK3_TS_MJ"."FRAME_FORMAT_15"
                             where fgcid = {3}
                             and {0} is not NULL)
                         group by lat, lon'''.format(lat, granularity, lon, fgcid)
