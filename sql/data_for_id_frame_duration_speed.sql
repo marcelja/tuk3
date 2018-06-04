@@ -83,5 +83,5 @@ seconds,
     group by fgcid, frame
     order by seconds;
 
-OUTPUT_TABLE = select lon, lat, FGCID, :helper.frame, occupancy, speed from :helper, :helper2 where :helper.seconds = :helper2.seconds order by :helper2.seconds;
+OUTPUT_TABLE = select :helper2.lon, :helper2.lat, FGCID, :helper.frame, occupancy, speed from :helper, :helper2 where :helper.seconds = :helper2.seconds order by :helper2.seconds;
 end;
