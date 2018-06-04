@@ -231,7 +231,7 @@ function addPolyline(coordinates, occupancy, startTime, endTime) {
   var distance = google.maps.geometry.spherical.computeLength(path.getPath());
   if (occupancy == 1) {
     // add a text with information about the price
-    addInformation(coordinates[parseInt(coordinates.length / 2)], startTime, endTime, distance)
+    addInformation(coordinates[coordinates.length - 1], startTime, endTime, distance)
   }
 
   path.setMap(map);
