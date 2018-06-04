@@ -52,6 +52,12 @@
     <div id="floating-panel">
       <button onclick="autoPlay()">▶</button>
       <button onclick="toggleHeatmap()">Toggle Heatmap</button>
+      <select id="heatmap-select" onchange="showHeatmap()">
+        <option value="none">None</option> 
+        <option value="all" selected>All Taxis</option> 
+        <option value="pickup">Pickup Points</option>
+        <option value="dropoff">Dropoff Points</option>
+      </select>
       <button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button>

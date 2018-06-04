@@ -27,19 +27,14 @@ function initSlider() {
 function onSliderChanged() {
   let timeValue = parseInt($('#time-slider .slider').val());
   let granularityValue = parseInt($('#granularity-slider .slider').val());
+  let mapValue = $('#heatmap-select').val();
   
   // update label
   $('#time-frame').text(Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   $('#granularity-slider .slider-label').text('Granularity: ' + granularityValue);
 
   // get data
-  let startTime = new Date().getTime();
-  $.getJSON('/timeframe_granularity/' + timeValue + '/0/' + granularityValue, (data) => {
-    let loadingTime = new Date().getTime() - startTime;
-    $('#loadingTime').text(loadingTime + ' ms');
-    let heatmapData = formatHeatmapData(data);
-    heatmap.setData(heatmapData);
-  });
+  loadHeatmap(mapValue, timeValue, granularityValue);
 }
 
 function autoPlay() {
@@ -53,13 +48,12 @@ function runLoop(timeValue) {
   $('#time-frame').text(Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   let granularityValue = parseInt($('#granularity-slider .slider').val());
   document.getElementsByClassName('slider')[0].value = timeValue;
+  let mapValue = $('#heatmap-select').val();
+
 
   setTimeout(function(){
 
-    $.getJSON('/timeframe_granularity/' + timeValue + '/0/' + granularityValue, (data) => {
-      let heatmapData = formatHeatmapData(data);
-      heatmap.setData(heatmapData);
-    });
+    loadHeatmap(mapValue, timeValue, granularityValue);
 
   if (play) runLoop(timeValue);
   }, 300);
@@ -89,8 +83,41 @@ function initMap() {
   });
 }
 
-function toggleHeatmap() {
-  heatmap.setMap(heatmap.getMap() ? null : map);
+function loadHeatmap(map, time, granularity) {
+  let urlBase = (function (map) {
+    switch (map) {
+      case 'all':
+        return '/timeframe_granularity/'
+        break;
+      case 'pickup':
+        return '/changepoints/pickup/'
+        break;
+      case 'dropoff':
+        return '/changepoints/dropoff/'
+        break;
+      default:
+        return '/timeframe_granularity/'
+        break;
+    }
+  })(map);
+
+  let startTime = new Date().getTime();
+  $.getJSON(urlBase + time + '/0/' + granularity, (data) => {
+    let loadingTime = new Date().getTime() - startTime;
+    $('#loadingTime').text(loadingTime + ' ms');
+    let heatmapData = formatHeatmapData(data);
+    heatmap.setData(heatmapData);
+  });
+}
+
+function showHeatmap() {
+  let value = $('#heatmap-select').val();
+  if (value === 'none') {
+    heatmap.setMap(null);
+  }
+  else {
+    onSliderChanged();
+  }
 }
 
 function changeGradient() {
