@@ -16,7 +16,7 @@ seconds,
     to_int(mod(seconds,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame,
     occupancy,
     speed
-    from "SHENZHEN_SECONDS"
+    from "SHENZHEN"
     where id = :id
     order by seconds;
     
@@ -29,7 +29,7 @@ seconds,
     lat,
     to_int(seconds/(:frame_duration * :points_per_frame_group)) as FGCID,
     to_int(mod(seconds,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
-    from "SHENZHEN_SECONDS"
+    from "SHENZHEN"
     where id = :id
     order by seconds
 
@@ -62,7 +62,7 @@ seconds,
     to_int(mod(seconds,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame,
     occupancy,
     speed
-    from "SHENZHEN_SECONDS"
+    from "SHENZHEN"
     where id = :id
     order by seconds;
     
@@ -75,7 +75,7 @@ seconds,
     lat,
     to_int(seconds/(:frame_duration * :points_per_frame_group)) as FGCID,
     to_int(mod(seconds,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
-    from "SHENZHEN_SECONDS"
+    from "SHENZHEN"
     where id = :id
     order by seconds
 
