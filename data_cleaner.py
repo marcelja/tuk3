@@ -16,7 +16,7 @@ def main():
 
 def _get_ids():
     with Cursor(SCHEMA_NAME) as cursor:
-        cursor.execute('select distinct id from "TAXI"."SHENZHEN"')
+        cursor.execute('select distinct id from shenzhen_clean')
         ids = cursor.fetchall()
         return ids
 
@@ -81,14 +81,27 @@ def clean_records(records_per_tid, current_id):
 def _too_high_interval(records, current_id):
     old_timestamp = records[0][2]
     diff_sum = 0
-    for record in records[1:]:
-        diff_sum = record[2] - old_timestamp
+    for idx, record in enumerate(records[1:]):
+        difference = (record[2] - old_timestamp).total_seconds()
+        # Next timestamp after 30 minutes
+        if difference > 1800:
+            dist = _calculate_distance((records[idx][1], records[idx][0]), (record[1], record[0]))
+            if dist > 0.25:
+                # Car is moving but is not sending information regularly
+                # Otherwise car is parking. That should be fine :)
+                diff_sum = diff_sum + difference
+        else:
+            diff_sum = diff_sum + difference
         old_timestamp = record[2]
-    avg_diff = (diff_sum.total_seconds() / len(records))
+    avg_diff = diff_sum / len(records)
 
     if avg_diff > TIME_INTERVAL_THRESHOLD:
         print('AVG time interval for id {} is {} seconds, deleting'.format(current_id, avg_diff))
         return True
+
+
+def _calculate_distance(last_point, current_point):
+    return geopy.distance.vincenty(last_point, current_point).km
 
 
 if __name__ == '__main__':
