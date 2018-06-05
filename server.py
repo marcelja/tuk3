@@ -136,45 +136,18 @@ def key_value(hour):
         print("matched")
         return Response(json.dumps(results), mimetype='application/json')
 
-@app.route('/changepoints/<mode>/<int:fgcid>/<int:frame>/<int:granularity>')
-def pickuppoints(mode, fgcid, frame, granularity):
+@app.route('/changepoints/<mode>/<int:fgcid>/<int:granularity>')
+def changepoints(mode, fgcid, granularity):
     with Cursor(SCHEMA_NAME) as cursor:
         results = []
 
         compare_direction = '>' if mode == 'pickup' else  '<'
 
-        if (fgcid != 0 and frame != 0):
-            query = '''SELECT lat, lon, count(*) AS weight 
-                        FROM (
-                            SELECT round(pf{0}py + ify, {2}) AS lat, 
-                                round(pf{0}px + ifx, {2}) AS lon 
-                            FROM frame_format_speed 
-                            WHERE occupancy{0} {4} occupancy{1} 
-                                AND fgcid = {3}
-                                AND pf{0}px IS NOT null
-                                AND pf{1}py IS NOT null
-                        ) 
-                        GROUP BY lat, lon
-                    '''.format(frame, frame - 1, granularity, fgcid, compare_diection)
-            cursor.execute(query)
-            results = cursor.fetchall()
-        elif (fgcid != 0 and frame == 0):
-            query = '''SELECT lat, lon, count(*) AS weight 
-                        FROM (
-                            SELECT round(ffs1.pf{0}py + ffs1.ify, {2}) AS lat, 
-                                round(ffs1.pf{0}px + ffs1.ifx, {2}) AS lon 
-                            FROM frame_format_speed ffs1, frame_format_speed ffs2
-                            WHERE ffs1.occupancy{0} {5} ffs2.occupancy39 
-                                AND ffs1.fgcid = {3}
-                                AND ffs2.fgcid = {4}
-                                AND ffs1.tid = ffs2.tid
-                                AND ffs1.pf{0}px IS NOT null
-                                AND ffs2.pf{0}px IS NOT null
-                        ) 
-                        GROUP BY lat, lon
-                    '''.format(frame, frame - 1, granularity, fgcid, fgcid - 1, compare_direction)
-            cursor.execute(query)
-            results = cursor.fetchall()
+        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', null)
+                '''.format(fgcid, granularity, compare_direction)
+        cursor.execute(query)
+        results = cursor.fetchall()
+        print(results)
         return Response(json.dumps(results), mimetype='application/json')
 
 def _convert_timestamp(ts):

@@ -102,25 +102,22 @@ function initMap() {
 }
 
 function loadHeatmap(map, time, granularity) {
-  let urlBase = (function (map) {
+  let url = (function (map) {
     switch (map) {
       case 'all':
-        return '/timeframe_granularity/'
+        return '/timeframe_granularity/' + time + '/0/' + granularity
         break;
       case 'pickup':
-        return '/changepoints/pickup/'
+        return '/changepoints/pickup/' + time + '/' + granularity
         break;
       case 'dropoff':
-        return '/changepoints/dropoff/'
-        break;
-      default:
-        return '/timeframe_granularity/'
+        return '/changepoints/dropoff/' + time + '/' + granularity
         break;
     }
   })(map);
 
   let startTime = new Date().getTime();
-  $.getJSON(urlBase + time + '/0/' + granularity, (data) => {
+  $.getJSON(url, (data) => {
     let loadingTime = new Date().getTime() - startTime;
     $('#loadingTime').text(loadingTime + ' ms');
     let heatmapData = formatHeatmapData(data);
