@@ -41,11 +41,12 @@ def worker_thread(ids, begin, end):
         counter = begin
         # while counter <= end:
         while counter <= 1:
+        # while counter <= 20:
             current_id = ids[counter][0]
 
             current_id = 22323
 
-            cursor.execute('select lon, lat, timestamp from shenzhen_clean where id={} order by timestamp'.format(current_id))
+            cursor.execute('select lon, lat, timestamp, speed from shenzhen_clean where id={} order by timestamp'.format(current_id))
             data = cursor.fetchall()
 
             clean_records(data, current_id)
@@ -66,30 +67,27 @@ def _remove_outliers(records, current_id):
     old_point = (records[0][1], records[0][0])
     old_timestamp = records[0][2]
     outliers = 0
-    previous_outlier = True
+
     for idx, record in enumerate(records[1:]):
-        time_diff = _time_diff(old_timestamp, record[2])
-        # if the interval is rather small, the calculated speed might not be
-        # accurate due to GPS inaccuracy
-        if time_diff > 5:
-            speed = _calculate_speed(old_point,
-                                     (record[1], record[0]),
-                                     old_timestamp,
-                                     record[2])
-            if speed > 150:
-                # This needs to be refactored, not working properly
-                outliers += 1
-                if previous_outlier:
-                    sp = _calculate_speed((records[idx - 2][1], records[idx - 2][0]),
-                                          (record[1], record[0]),
-                                          records[idx - 2][2],
-                                          record[2])
-                    if sp < 150:
-                        print("delete record with id {} and timestamp {}".format(current_id, records[idx - 1][2]))
-                else:
-                    previous_outlier = True
-            else:
-                previous_outlier = False
+        speed = _calculate_speed(old_point,
+                                 (record[1], record[0]),
+                                 old_timestamp,
+                                 record[2])
+        if speed > 150:
+            # This needs to be refactored, not working properly
+            outliers += 1
+            print("outlier with id {} and timestamp {}, speed {}"
+                  .format(current_id, record[2], record[3]))
+            # Calc speed to next point
+            sp = _calculate_speed(old_point,
+                                  (records[idx + 2][1], records[idx + 2][0]),
+                                  old_timestamp,
+                                  records[idx + 2][2])
+
+            if sp < 150:
+                # TODO: really delete entry
+                print("delete record with id {} and timestamp {}, speed {}"
+                      .format(current_id, record[2], record[3]))
         old_point = (record[1], record[0])
         old_timestamp = record[2]
     print("ID {} has {} outliers".format(current_id, outliers))
@@ -118,10 +116,13 @@ def _too_high_interval(records, current_id):
         print('AVG time interval for id {} is {} seconds, deleting'.format(current_id, avg_diff))
 
 
-def _calculate_speed(last_point, current_point, last_timestamp, current_timestamp):
+def _calculate_speed(last_point,
+                     current_point,
+                     last_timestamp,
+                     current_timestamp):
     distance = _calculate_distance(last_point, current_point)
     time_difference = _time_diff(last_timestamp, current_timestamp) / 3600
-    return distance / time_difference if time_difference != 0.0 else 999999999999
+    return distance / time_difference if time_difference != 0.0 else 9999999999
 
 
 def _calculate_distance(last_point, current_point):
