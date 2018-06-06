@@ -2,7 +2,7 @@ drop table "TUK3_TS_MJ"."SHENZHEN_CLEAN" ;
 create column table SHENZHEN_CLEAN like "TAXI"."SHENZHEN";
 
 insert into "TUK3_TS_MJ"."SHENZHEN_CLEAN"(
-select * from "TAXI"."SHENZHEN"
+select distinct * from "TAXI"."SHENZHEN"
 where id not in ( select id from "TAXI"."SHENZHEN" group by id  having count(id) < 500)
 and id not in ( 
     select id from (
