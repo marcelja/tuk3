@@ -163,6 +163,17 @@ function onDrawRouteClick() {
   drawRoute(trajectoryId);
 }
 
+function toggleProfitOverlay() {
+  if ($('#profit-overlay-btn').hasClass('active')) {
+    $('#profit-overlay').removeClass('visible');
+    $('#profit-overlay').addClass('hidden');
+  } 
+  else {
+    $('#profit-overlay').removeClass('hidden');
+    $('#profit-overlay').addClass('visible');
+  }
+}
+
 function calculateTimeDifference(startTime, endTime) {
   var start = startTime.split(":");
   var end = endTime.split(":");
