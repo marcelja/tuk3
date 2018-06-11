@@ -63,7 +63,7 @@ def worker_thread(ids, begin, end):
         logging.warning('Starting thread from {} to {}'.format(begin, end))
 
         counter = begin
-        while counter <= 20:
+        while counter <= end:
             current_id = ids[counter][0]
 
             cursor.execute('select lon, lat, timestamp, speed, occupancy from shenzhen_clean where id={} order by timestamp'.format(current_id))
