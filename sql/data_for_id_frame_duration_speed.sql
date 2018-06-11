@@ -2,8 +2,8 @@ drop type id_infos_speed;
 create type id_infos_speed as table (lon float(7), lat float(7), fgcid int, frame int, occupancy tinyint, speed tinyint);
 
 
-drop  procedure data_for_id_speed_occupancy;
-    create procedure data_for_id_speed_occupancy(in id int, in frame_duration int, in points_per_frame_group int, out OUTPUT_TABLE "TUK3_TS_MJ"."ID_INFOS_SPEED")
+drop  procedure data_for_id_speed_occupancy_min;
+    create procedure data_for_id_speed_occupancy_min(in id int, in frame_duration int, in points_per_frame_group int, out OUTPUT_TABLE "TUK3_TS_MJ"."ID_INFOS_SPEED")
 LANGUAGE SQLSCRIPT AS
  BEGIN 
   
@@ -44,12 +44,8 @@ end;
 ---------------- AVERAGE LON AND LAT -------------------
 
 
-drop type id_infos_speed;
-create type id_infos_speed as table (lon float(7), lat float(7), fgcid int, frame int, occupancy tinyint, speed tinyint);
-
-
-drop  procedure data_for_id_speed_occupancy;
-    create procedure data_for_id_speed_occupancy(in id int, in frame_duration int, in points_per_frame_group int, out OUTPUT_TABLE "TUK3_TS_MJ"."ID_INFOS_SPEED")
+drop  procedure data_for_id_speed_occupancy_avg;
+    create procedure data_for_id_speed_occupancy_avg(in id int, in frame_duration int, in points_per_frame_group int, out OUTPUT_TABLE "TUK3_TS_MJ"."ID_INFOS_SPEED")
 LANGUAGE SQLSCRIPT AS
  BEGIN 
   
