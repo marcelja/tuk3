@@ -53,6 +53,7 @@ body {
 }
 #loadingTime::before {
     content: "⏱";
+    padding-right: 0.3rem;
 }
 
 #input-trajectory {
