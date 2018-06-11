@@ -30,15 +30,14 @@ window.onload = function() {
 function initSlider() {
   let timeSlider = $('#time-slider .slider');
   let granularitySlider = $('#granularity-slider .slider');
+  timeSlider.val(0);
+  granularitySlider.val(6);
   timeSlider.on('change', () => {
     onSliderChanged();
   });
   granularitySlider.on('change', () => {
     onSliderChanged();
   });
-  timeSlider.val(0);
-  granularitySlider.val(6);
-  onSliderChanged();
 }
 
 function onSliderChanged() {
@@ -132,6 +131,9 @@ function showHeatmap() {
     heatmap.setMap(null);
   }
   else {
+    if (!heatmap.map) {
+      heatmap.setMap(map);
+    }
     onSliderChanged();
   }
 }
