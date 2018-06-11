@@ -123,7 +123,6 @@ function loadHeatmap(mapType, time, granularity) {
     $('#loadingTime').text(loadingTime + ' ms');
     let heatmapData = formatHeatmapData(data);
     heatmap.setData(heatmapData);
-    heatmap.setMap(map);
   });
 }
 
