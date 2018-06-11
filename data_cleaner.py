@@ -59,56 +59,55 @@ def clean_records(records_per_tid, current_id):
 
 
 def _remove_outliers(records, current_id):
-    cursor = Cursor(SCHEMA_NAME)
-    old_point = (records[0][1], records[0][0])
-    old_timestamp = records[0][2]
-    outliers = 0
-    fixed = 0
+    with Cursor(SCHEMA_NAME) as cursor:
+        old_point = (records[0][1], records[0][0])
+        old_timestamp = records[0][2]
+        outliers = 0
+        fixed = 0
 
-    for idx, record in enumerate(records[1:]):
-        speed = _calculate_speed(old_point,
-                                 (record[1], record[0]),
-                                 old_timestamp,
-                                 record[2])
+        for idx, record in enumerate(records[1:]):
+            speed = _calculate_speed(old_point,
+                                     (record[1], record[0]),
+                                     old_timestamp,
+                                     record[2])
 
-        # If speed is higher than 150 km/h we think its an outlier
-        if speed > 150:
-            outliers += 1
-            # Calc speed to next point
-            if len(records) >= idx + 3:
-                sp = _calculate_speed(old_point,
-                                      (records[idx + 2][1], records[idx + 2][0]),
-                                      old_timestamp,
-                                      records[idx + 2][2])
+            # If speed is higher than 150 km/h we think its an outlier
+            if speed > 150:
+                outliers += 1
+                # Calc speed to next point
+                if len(records) >= idx + 3:
+                    sp = _calculate_speed(old_point,
+                                          (records[idx + 2][1], records[idx + 2][0]),
+                                          old_timestamp,
+                                          records[idx + 2][2])
 
-                # If the speed to the next point is acceptable
-                # we think that there was a jump, that can be deleted
-                if sp < 150:
-                    # with Cursor(SCHEMA_NAME) as cursor:
-                    query = '''delete from shenzhen_clean
-                               where id = {}
-                               and timestamp = '{}'
-                               and lon = {}
-                               and lat = {}
-                               and speed = {}
-                               and occupancy = {}
-                               '''.format(current_id,
-                                          record[2],
-                                          record[0],
-                                          record[1],
-                                          record[3],
-                                          record[4])
-                    cursor.execute(query)
+                    # If the speed to the next point is acceptable
+                    # we think that there was a jump, that can be deleted
+                    if sp < 150:
+                        # with Cursor(SCHEMA_NAME) as cursor:
+                        query = '''delete from shenzhen_clean
+                                   where id = {}
+                                   and timestamp = '{}'
+                                   and lon = {}
+                                   and lat = {}
+                                   and speed = {}
+                                   and occupancy = {}
+                                   '''.format(current_id,
+                                              record[2],
+                                              record[0],
+                                              record[1],
+                                              record[3],
+                                              record[4])
+                        cursor.execute(query)
 
-                    fixed += 1
-        old_point = (record[1], record[0])
-        old_timestamp = record[2]
-    if outliers > 200 or outliers - fixed > 100:
-        # with Cursor(SCHEMA_NAME) as cursor:
-        query = 'delete from shenzhen_clean where id = {}'.format(current_id)
-        cursor.execute(query)
-        logging.warning("ID {} has {} outliers, {} deleted".format(current_id, outliers, fixed))
-    cursor.connection.close()
+                        fixed += 1
+            old_point = (record[1], record[0])
+            old_timestamp = record[2]
+        if outliers > 200 or outliers - fixed > 100:
+            # with Cursor(SCHEMA_NAME) as cursor:
+            query = 'delete from shenzhen_clean where id = {}'.format(current_id)
+            cursor.execute(query)
+            logging.warning("ID {} has {} outliers, {} deleted".format(current_id, outliers, fixed))
 
 
 def _too_high_interval(records, current_id):
