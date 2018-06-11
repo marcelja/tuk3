@@ -12,6 +12,10 @@ and id not in (
         group by id , occupancy
         ) 
     where c < 120)
+and id not in (
+    select id from "TAXI"."SHENZHEN"
+    group by id
+    having max(occupancy) = 0)
 and lon < 116
 and lon > 113
 and lat > 22
