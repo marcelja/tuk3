@@ -2,7 +2,7 @@ drop type id_infos_speed;
 create type id_infos_speed as table (lon float(7), lat float(7), fgcid int, frame int, occupancy tinyint, speed tinyint);
 
 drop procedure data_for_id_speed_occupancy_ts_min;
-create procedure data_for_id_speed_occupancy_ts_min(in id int , out OUTPUT_TABLE id_infos_speed )
+create procedure data_for_id_speed_occupancy_ts_min(in id int , in frame_duration int, in points_per_frame_group int, out OUTPUT_TABLE id_infos_speed )
 LANGUAGE SQLSCRIPT AS
  BEGIN 
   
@@ -44,7 +44,7 @@ end;
 
 
 drop procedure data_for_id_speed_occupancy_ts_avg;
-create procedure data_for_id_speed_occupancy_ts_avg(in id int , out OUTPUT_TABLE id_infos_speed )
+create procedure data_for_id_speed_occupancy_ts_avg(in id int , in frame_duration int, in points_per_frame_group int, out OUTPUT_TABLE id_infos_speed )
 LANGUAGE SQLSCRIPT AS
  BEGIN 
   

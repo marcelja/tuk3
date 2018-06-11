@@ -1,3 +1,4 @@
+import time
 import os
 from threading import Thread
 from cursor import Cursor
@@ -5,13 +6,33 @@ from cursor import Cursor
 
 SCHEMA_NAME = 'TUK3_TS_MJ'
 THREADS = 8
-FRAME_DURATION = 15
+# FRAME_DURATION = 15
 POINTS_PER_FRAME_GROUP = 40
 
 
 def main():
     ids = _get_ids()
-    _start_threads(ids)
+
+    create_csvs(15, 'ts_avg', ids)
+    create_csvs(15, 'avg', ids)
+    create_csvs(15, 'ts_min', ids)
+    create_csvs(15, 'min', ids)
+    create_csvs(30, 'ts_avg', ids)
+    create_csvs(30, 'avg', ids)
+    create_csvs(30, 'ts_min', ids)
+    create_csvs(30, 'min', ids)
+
+
+def create_csvs(frame_duration, procedure, ids):
+    directory = 'frame_format_' + str(frame_duration) + '_' + procedure
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    start = time.time()
+    _start_threads(ids, frame_duration, procedure, directory)
+    end = time.time()
+    elapsed = end - start
+    print('elapsed time: {} for {}'.format(elapsed, directory))
 
 
 def _get_ids():
@@ -21,26 +42,30 @@ def _get_ids():
         return ids
 
 
-def _start_threads(ids):
+def _start_threads(ids, frame_duration, procedure, directory):
     ids_per_thread = len(ids) / THREADS
     threads = []
     for i in range(THREADS):
         id_offset_begin = int(i * ids_per_thread)
         id_offset_end = int(i * ids_per_thread + ids_per_thread - 1)
-        thread = Thread(target=worker_thread, args=(ids, id_offset_begin, id_offset_end))
+        thread = Thread(target=worker_thread, args=(ids, id_offset_begin, id_offset_end,
+                                                    frame_duration, procedure, directory))
         threads.append(thread)
         thread.start()
     [t.join() for t in threads]
 
 
-def worker_thread(ids, begin, end):
+def worker_thread(ids, begin, end, frame_duration, procedure, directory):
     with Cursor(SCHEMA_NAME) as cursor:
-        filename = 'frame-{}-{}.csv'.format(begin, end)
+        filename = '{}/frame-{}-{}.csv'.format(directory, begin, end)
         while begin <= end:
             # Result is tuple
             current_id = ids[begin][0]
-            print('Working on id {}'.format(current_id))
-            cursor.execute('call data_for_id_speed_occupancy({}, {}, {}, ?)'.format(current_id, FRAME_DURATION, POINTS_PER_FRAME_GROUP))
+            # print('Working on id {}'.format(current_id))
+            cursor.execute('call data_for_id_speed_occupancy_{}({}, {}, {}, ?)'.format(procedure,
+                                                                                       current_id,
+                                                                                       frame_duration,
+                                                                                       POINTS_PER_FRAME_GROUP))
             data = cursor.fetchall()
 
             fgcid = -1
