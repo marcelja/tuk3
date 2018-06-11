@@ -30,10 +30,10 @@ window.onload = function() {
 function initSlider() {
   let timeSlider = $('#time-slider .slider');
   let granularitySlider = $('#granularity-slider .slider');
-  timeSlider.on('input', () => {
+  timeSlider.on('change', () => {
     onSliderChanged();
   });
-  granularitySlider.on('input', () => {
+  granularitySlider.on('change', () => {
     onSliderChanged();
   });
   timeSlider.val(0);
@@ -56,6 +56,7 @@ function onSliderChanged() {
 
 function autoPlay() {
   play = !play;
+  $('#btn-autoplay').text(play ? '❙ ❙' : '▶');
   let timeValue = parseInt($('#time-slider .slider').val());
   runLoop(timeValue);
 }
