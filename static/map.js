@@ -101,9 +101,9 @@ function initMap() {
   });
 }
 
-function loadHeatmap(map, time, granularity) {
-  let url = (function (map) {
-    switch (map) {
+function loadHeatmap(mapType, time, granularity) {
+  let url = (function (mapType) {
+    switch (mapType) {
       case 'all':
         return '/timeframe_granularity/' + time + '/0/' + granularity
         break;
@@ -114,7 +114,7 @@ function loadHeatmap(map, time, granularity) {
         return '/changepoints/dropoff/' + time + '/' + granularity
         break;
     }
-  })(map);
+  })(mapType);
 
   let startTime = new Date().getTime();
   $.getJSON(url, (data) => {
@@ -122,6 +122,7 @@ function loadHeatmap(map, time, granularity) {
     $('#loadingTime').text(loadingTime + ' ms');
     let heatmapData = formatHeatmapData(data);
     heatmap.setData(heatmapData);
+    heatmap.setMap(map);
   });
 }
 
