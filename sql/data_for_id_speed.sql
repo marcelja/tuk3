@@ -11,11 +11,11 @@ helper = select
 timestamp,
     lon,
     lat,
-    hour(timestamp) * 6 + to_int(minute(timestamp)/10) as FGCID,
-    get_timeframe(timestamp) as frame,
+    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame, 
     occupancy,
     speed
-    from "TAXI"."SHENZHEN"
+    from "SHENZHEN"
     where id = :id
     order by timestamp;
     
@@ -26,9 +26,9 @@ select
 timestamp,
     lon,
     lat,
-    hour(timestamp) * 6 + to_int(minute(timestamp)/10) as FGCID,
-    get_timeframe(timestamp) as frame
-    from "TAXI"."SHENZHEN"
+    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
+    from "SHENZHEN"
     where id = :id
     order by timestamp
 
@@ -53,11 +53,11 @@ helper = select
 timestamp,
     lon,
     lat,
-    hour(timestamp) * 6 + to_int(minute(timestamp)/10) as FGCID,
-    get_timeframe(timestamp) as frame,
+    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame,
     occupancy,
     speed
-    from "TAXI"."SHENZHEN"
+    from "SHENZHEN"
     where id = :id
     order by timestamp;
     
@@ -68,9 +68,9 @@ select
 timestamp,
     lon,
     lat,
-    hour(timestamp) * 6 + to_int(minute(timestamp)/10) as FGCID,
-    get_timeframe(timestamp) as frame
-    from "TAXI"."SHENZHEN"
+    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
+    from "SHENZHEN"
     where id = :id
     order by timestamp
 
