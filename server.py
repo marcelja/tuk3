@@ -143,7 +143,7 @@ def changepoints(mode, fgcid, granularity):
 
         compare_direction = '>' if mode == 'pickup' else  '<'
 
-        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', null)
+        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', ?)
                 '''.format(fgcid, granularity, compare_direction)
         cursor.execute(query)
         results = cursor.fetchall()

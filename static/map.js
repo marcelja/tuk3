@@ -30,10 +30,10 @@ window.onload = function() {
 function initSlider() {
   let timeSlider = $('#time-slider .slider');
   let granularitySlider = $('#granularity-slider .slider');
-  timeSlider.on('input', () => {
+  timeSlider.on('change', () => {
     onSliderChanged();
   });
-  granularitySlider.on('input', () => {
+  granularitySlider.on('change', () => {
     onSliderChanged();
   });
   timeSlider.val(0);
@@ -56,6 +56,7 @@ function onSliderChanged() {
 
 function autoPlay() {
   play = !play;
+  $('#btn-autoplay').text(play ? '❙ ❙' : '▶');
   let timeValue = parseInt($('#time-slider .slider').val());
   runLoop(timeValue);
 }
@@ -101,9 +102,9 @@ function initMap() {
   });
 }
 
-function loadHeatmap(map, time, granularity) {
-  let url = (function (map) {
-    switch (map) {
+function loadHeatmap(mapType, time, granularity) {
+  let url = (function (mapType) {
+    switch (mapType) {
       case 'all':
         return '/timeframe_granularity/' + time + '/0/' + granularity
         break;
@@ -114,7 +115,7 @@ function loadHeatmap(map, time, granularity) {
         return '/changepoints/dropoff/' + time + '/' + granularity
         break;
     }
-  })(map);
+  })(mapType);
 
   let startTime = new Date().getTime();
   $.getJSON(url, (data) => {
@@ -122,6 +123,7 @@ function loadHeatmap(map, time, granularity) {
     $('#loadingTime').text(loadingTime + ' ms');
     let heatmapData = formatHeatmapData(data);
     heatmap.setData(heatmapData);
+    heatmap.setMap(map);
   });
 }
 
