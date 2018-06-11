@@ -13,10 +13,8 @@ QUERIES = []
 def main():
     ids = _get_ids()
     _start_threads(ids)
-    with open('queries', 'w') as f:
-        for query in QUERIES:
-            f.write(query)
-            f.write('\n')
+    print(len(QUERIES))
+    _execute_queries()
 
 
 def _get_ids():
@@ -38,12 +36,34 @@ def _start_threads(ids):
     [t.join() for t in threads]
 
 
+def _execute_queries():
+    queries_per_thread = len(QUERIES) / THREADS
+    threads = []
+    for i in range(THREADS):
+        id_offset_begin = int(i * queries_per_thread)
+        id_offset_end = int(i * queries_per_thread + queries_per_thread - 1)
+        thread = Thread(target=insert_thread, args=(id_offset_begin, id_offset_end))
+        threads.append(thread)
+        thread.start()
+    [t.join() for t in threads]
+
+
+def insert_thread(begin, end):
+    with Cursor(SCHEMA_NAME) as cursor:
+        counter = begin
+        while counter <= end:
+            if counter % 500 == 0:
+                logging.warning('worker {}: {}%'.format(begin, round((counter-begin)*100/(end-begin),1)))
+            cursor.execute(QUERIES[counter])
+            counter += 1
+
+
 def worker_thread(ids, begin, end):
     with Cursor(SCHEMA_NAME) as cursor:
         logging.warning('Starting thread from {} to {}'.format(begin, end))
 
         counter = begin
-        while counter <= end:
+        while counter <= 20:
             current_id = ids[counter][0]
 
             cursor.execute('select lon, lat, timestamp, speed, occupancy from shenzhen_clean where id={} order by timestamp'.format(current_id))
