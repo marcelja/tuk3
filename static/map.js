@@ -5,6 +5,23 @@
 var map, heatmap, paths = [], markers = [];
 var play = false;
 
+var gradient = [
+  'rgba(0, 255, 255, 0)',
+  'rgba(0, 255, 255, 1)',
+  'rgba(0, 191, 255, 1)',
+  'rgba(0, 127, 255, 1)',
+  'rgba(0, 63, 255, 1)',
+  'rgba(0, 0, 255, 1)',
+  'rgba(0, 0, 223, 1)',
+  'rgba(0, 0, 191, 1)',
+  'rgba(0, 0, 159, 1)',
+  'rgba(0, 0, 127, 1)',
+  'rgba(63, 0, 91, 1)',
+  'rgba(127, 0, 63, 1)',
+  'rgba(191, 0, 31, 1)',
+  'rgba(255, 0, 0, 1)'
+  ]
+
 window.onload = function() {
   loadScript();
   initSlider();
@@ -13,37 +30,32 @@ window.onload = function() {
 function initSlider() {
   let timeSlider = $('#time-slider .slider');
   let granularitySlider = $('#granularity-slider .slider');
-  timeSlider.on('input', () => {
-    onSliderChanged();
-  });
-  granularitySlider.on('input', () => {
-    onSliderChanged();
-  });
   timeSlider.val(0);
   granularitySlider.val(6);
-  onSliderChanged();
+  timeSlider.on('change', () => {
+    onSliderChanged();
+  });
+  granularitySlider.on('change', () => {
+    onSliderChanged();
+  });
 }
 
 function onSliderChanged() {
   let timeValue = parseInt($('#time-slider .slider').val());
   let granularityValue = parseInt($('#granularity-slider .slider').val());
+  let mapValue = $('#heatmap-select').val();
   
   // update label
   $('#time-frame').text(Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   $('#granularity-slider .slider-label').text('Granularity: ' + granularityValue);
 
   // get data
-  let startTime = new Date().getTime();
-  $.getJSON('/timeframe_granularity/' + timeValue + '/0/' + granularityValue, (data) => {
-    let loadingTime = new Date().getTime() - startTime;
-    $('#loadingTime').text(loadingTime + ' ms');
-    let heatmapData = formatHeatmapData(data);
-    heatmap.setData(heatmapData);
-  });
+  loadHeatmap(mapValue, timeValue, granularityValue);
 }
 
 function autoPlay() {
   play = !play;
+  $('#btn-autoplay').text(play ? '❙ ❙' : '▶');
   let timeValue = parseInt($('#time-slider .slider').val());
   runLoop(timeValue);
 }
@@ -53,13 +65,12 @@ function runLoop(timeValue) {
   $('#time-frame').text(Math.floor(timeValue / 6) + ' : ' + timeValue % 6 + '0');
   let granularityValue = parseInt($('#granularity-slider .slider').val());
   document.getElementsByClassName('slider')[0].value = timeValue;
+  let mapValue = $('#heatmap-select').val();
+
 
   setTimeout(function(){
 
-    $.getJSON('/timeframe_granularity/' + timeValue + '/0/' + granularityValue, (data) => {
-      let heatmapData = formatHeatmapData(data);
-      heatmap.setData(heatmapData);
-    });
+    loadHeatmap(mapValue, timeValue, granularityValue);
 
   if (play) runLoop(timeValue);
   }, 300);
@@ -84,32 +95,50 @@ function initMap() {
   });
 
   heatmap = new google.maps.visualization.HeatmapLayer({
-    data: getPoints(),
-    map: map
+    map: map,
+    gradient: gradient,
+    radius: 20
   });
 }
 
-function toggleHeatmap() {
-  heatmap.setMap(heatmap.getMap() ? null : map);
+function loadHeatmap(mapType, time, granularity) {
+  let url = (function (mapType) {
+    switch (mapType) {
+      case 'all':
+        return '/timeframe_granularity/' + time + '/0/' + granularity
+        break;
+      case 'pickup':
+        return '/changepoints/pickup/' + time + '/' + granularity
+        break;
+      case 'dropoff':
+        return '/changepoints/dropoff/' + time + '/' + granularity
+        break;
+    }
+  })(mapType);
+
+  let startTime = new Date().getTime();
+  $.getJSON(url, (data) => {
+    let loadingTime = new Date().getTime() - startTime;
+    $('#loadingTime').text(loadingTime + ' ms');
+    let heatmapData = formatHeatmapData(data);
+    heatmap.setData(heatmapData);
+  });
+}
+
+function showHeatmap() {
+  let value = $('#heatmap-select').val();
+  if (value === 'none') {
+    heatmap.setMap(null);
+  }
+  else {
+    if (!heatmap.map) {
+      heatmap.setMap(map);
+    }
+    onSliderChanged();
+  }
 }
 
 function changeGradient() {
-  var gradient = [
-  'rgba(0, 255, 255, 0)',
-  'rgba(0, 255, 255, 1)',
-  'rgba(0, 191, 255, 1)',
-  'rgba(0, 127, 255, 1)',
-  'rgba(0, 63, 255, 1)',
-  'rgba(0, 0, 255, 1)',
-  'rgba(0, 0, 223, 1)',
-  'rgba(0, 0, 191, 1)',
-  'rgba(0, 0, 159, 1)',
-  'rgba(0, 0, 127, 1)',
-  'rgba(63, 0, 91, 1)',
-  'rgba(127, 0, 63, 1)',
-  'rgba(191, 0, 31, 1)',
-  'rgba(255, 0, 0, 1)'
-  ]
   heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
 }
 
@@ -119,26 +148,6 @@ function changeRadius() {
 
 function changeOpacity() {
   heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
-}
-
-function getPoints() {
-  return [
-  {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
-  new google.maps.LatLng(37.782, -122.445),
-  {location: new google.maps.LatLng(37.782, -122.443), weight: 2},
-  {location: new google.maps.LatLng(37.782, -122.441), weight: 3},
-  {location: new google.maps.LatLng(37.782, -122.439), weight: 2},
-  new google.maps.LatLng(37.782, -122.437),
-  {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
-
-  {location: new google.maps.LatLng(37.785, -122.447), weight: 3},
-  {location: new google.maps.LatLng(37.785, -122.445), weight: 2},
-  new google.maps.LatLng(37.785, -122.443),
-  {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
-  new google.maps.LatLng(37.785, -122.439),
-  {location: new google.maps.LatLng(37.785, -122.437), weight: 2},
-  {location: new google.maps.LatLng(37.785, -122.435), weight: 3}
-  ];
 }
 
 function onInputTrajectoryKeypress(event) {
@@ -152,6 +161,17 @@ function onInputTrajectoryKeypress(event) {
 function onDrawRouteClick() {
   let trajectoryId = parseInt($('#input-trajectory').val());
   drawRoute(trajectoryId);
+}
+
+function toggleProfitOverlay() {
+  if ($('#profit-overlay-btn').hasClass('active')) {
+    $('#profit-overlay').removeClass('visible');
+    $('#profit-overlay').addClass('hidden');
+  } 
+  else {
+    $('#profit-overlay').removeClass('hidden');
+    $('#profit-overlay').addClass('visible');
+  }
 }
 
 function calculateTimeDifference(startTime, endTime) {
@@ -173,10 +193,17 @@ function addInformation(position, startTime, endTime, distance) {
     est. price: 11.00¥ + ${km}¥ (km) + ${waiting}¥ (waiting) 
     = ${11+km+waiting}¥`
   });
+
+  var icon = {
+    url: "static/yuan.png",
+    scaledSize: new google.maps.Size(30, 30)
+  };
+
   var marker = new google.maps.Marker({
     position: position,
     map: map,
-    title: 'Taxi'
+    title: 'Taxi',
+    icon: icon
   });
   marker.addListener('click', function() {
     infowindow.open(map, marker);
@@ -201,10 +228,17 @@ function addPolyline(coordinates, occupancy, startTime, endTime) {
       repeat: '120px'
     }]
   });
+
   var distance = google.maps.geometry.spherical.computeLength(path.getPath());
   if (occupancy == 1) {
     // add a text with information about the price
-    addInformation(coordinates[parseInt(coordinates.length / 2)], startTime, endTime, distance)
+    var markerId = markers.length;
+    addInformation(coordinates[coordinates.length - 1], startTime, endTime, distance);
+
+    google.maps.event.addListener(path, 'click', function(h) {
+      // trigger click on marker for current path
+      google.maps.event.trigger(markers[markerId], 'click', {});
+    });
   }
 
   path.setMap(map);

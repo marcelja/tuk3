@@ -3,76 +3,128 @@
   <head>
     <meta charset="utf-8">
     <title>Heatmaps</title>
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #floating-panel {
-        position: absolute;
-        top: 10px;
-        left: 0;
-        right: 0;
-        z-index: 5;
-        background-color: #fff;
-        padding: 5px;
-        border: 1px solid #999;
-        text-align: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        line-height: 30px;
-        padding-left: 10px;
-        width: 55em;
-        margin: 0 auto;
-      }
-      #time-slider, #granularity-slider {
-        width: 25em;
-        position: relative;
-        line-height: 1;
-        display: inline-block;
-      }
-      .slider {
-        width: 90%;
-      }
-      #loadingTimeContainer {
-        padding-top: 20px;
-        margin-left: 1em;
-        display: inline;
-      }
-    </style>
+    <link href="{{ url_for('static', filename='bootstrap-4.1.0/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
   </head>
 
   <body>
     <div id="floating-panel">
-      <button onclick="autoPlay()">▶</button>
-      <button onclick="toggleHeatmap()">Toggle Heatmap</button>
-      <button onclick="changeGradient()">Change gradient</button>
-      <button onclick="changeRadius()">Change radius</button>
-      <button onclick="changeOpacity()">Change opacity</button>
-      <input id="input-trajectory" type="number" placeholder="Trajectory ID" onkeypress="onInputTrajectoryKeypress(event)">
-      <button onclick="onDrawRouteClick()">Draw Route</button>
-      <button onclick="clearPaths()">Remove Route</button>
-      <div id="loadingTimeContainer">
-        ⏱ <span id="loadingTime"></span>
+      <div class="form-inline justify-content-center">
+        <button class="btn btn-sm btn-secondary mr-1" id="btn-autoplay" onclick="autoPlay()">▶</button>
+        <button class="btn btn-sm btn-secondary mr-1" onclick="toggleHeatmap()">Toggle Heatmap</button>
+        <select class="form-control form-control-sm mr-1" id="heatmap-select" onchange="showHeatmap()">
+          <option value="none">None</option> 
+          <option value="all" selected>All Taxis</option> 
+          <option value="pickup">Pickup Points</option>
+          <option value="dropoff">Dropoff Points</option>
+        </select>
+        <div class="btn-group btn-group-sm mr-1">
+          <button class="btn btn-secondary" onclick="changeGradient()">Change gradient</button>
+          <button class="btn btn-secondary" onclick="changeRadius()">Change radius</button>
+          <button class="btn btn-secondary" onclick="changeOpacity()">Change opacity</button>
+        </div>
+        <div class="input-group input-group-sm mr-1">
+          <input class="form-control" id="input-trajectory" type="number" placeholder="Trajectory ID" onkeypress="onInputTrajectoryKeypress(event)">
+          <div class="input-group-append">
+            <button class="btn btn-secondary" onclick="onDrawRouteClick()">Draw Route</button>
+            <button class="btn btn-secondary" onclick="clearPaths()">Remove Route</button>
+          </div>
+        </div>
       </div>
-      <div id="time-slider">
-        <div class="slider-label">⌚ <span id="time-frame">00:00</span></div>
-        <input class="slider" type="range" value="0:00" min="0" max="143" step="1">
-      </div>
-      <div id="granularity-slider">
-        <div class="slider-label">Granularity: 6</div>
-        <input class="slider" type="range" value="6" min="0" max="6" step="1">
+      <div class="slider-container">
+        <div id="time-slider">
+          <span class="slider-label">⌚ <span id="time-frame">00:00</span></span>
+          <input class="slider" type="range" value="0:00" min="0" max="143" step="1">
+        </div>
+        <div id="granularity-slider">
+          <span class="slider-label">Granularity: 6</span>
+          <input class="slider" type="range" value="6" min="0" max="6" step="1">
+        </div>
+        <span id="loadingTime"></span>
       </div>
     </div>
     <div id="map"></div>
+    <button id="profit-overlay-btn" class="btn btn-light" data-toggle="button" aria-pressed="false" onclick="toggleProfitOverlay();">¥</button>
+    <div id="profit-overlay">
+      <h4>100 most profitable Taxis</h4>
+      <div>
+        <table class="table table-sm table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Trajectoy ID</th>
+              <th scope="col"># Tours</th>
+              <th scope="col">Distance</th>
+              <th scope="col">Profit ¥</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+              <tr>
+                <td scope="col">22223</td>
+                <td scope="col">12</td>
+                <td scope="col">54</td>
+                <td scope="col">234</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <script src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap-4.1.0/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='map.js') }}"></script>
   </body>
 </html>

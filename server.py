@@ -27,7 +27,7 @@ def trajectory_point(tid):
                    order by timestamp'''.format(tid)
         cursor.execute(query)
         return Response(json.dumps(cursor.fetchall(),
-                                   default=_convert_timestamp),
+                                   default=_convert_timestamp, separators=(',', ':')),
                         mimetype='application/json')
 
 
@@ -36,7 +36,10 @@ def trajectory_frame(tid):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
         # Layout: tid, fgcid, ifx, ify, pf0px, pf0py, ...
-        query = '''select * from "TUK3_TS_MJ"."FRAMEFORMAT2"
+        query = 'select tid, fgcid, ifx, ify'
+        for i in range(40):
+            query += ', pf0px, pf1px'
+        query += ''' from "TUK3_TS_MJ"."FRAME_FORMAT_15"
                    where tid = {}
                    order by fgcid'''.format(tid)
         cursor.execute(query)
@@ -51,7 +54,7 @@ def trajectory_frame(tid):
                     result.append([framegroup[index + 1] + ify,
                                    framegroup[index] + ifx,
                                    _get_timestamp(framegroup[1], frame)])
-        return Response(json.dumps(result), mimetype='application/json')
+        return Response(json.dumps(result, separators=(',', ':')), mimetype='application/json')
 
 
 @app.route('/trajectory_keyvalue/<int:tid>')
@@ -64,7 +67,7 @@ def trajectory_keyvalue(tid):
         result_tuple = cursor.fetchone()
         # tuple contains only one selected value
         trajectory_object = result_tuple[0].read()
-        return Response(json.dumps(json.loads(trajectory_object)),
+        return Response(json.dumps(json.loads(trajectory_object), separators=(',', ':')),
                         mimetype='application/json')
 
 
@@ -74,12 +77,12 @@ def timeframe(fgcid, frame):
         lat = 'PF{}PX'.format(frame)
         lon = 'PF{}PY'.format(frame)
         query = '''select {0} + ify as lat, {1} + ifx as lon
-                   from "TUK3_TS_MJ"."FRAMEFORMAT2"
+                   from "TUK3_TS_MJ"."FRAME_FORMAT_15"
                    where fgcid = {2}
                    and {0} is not NULL'''.format(lat, lon, fgcid)
 
         cursor.execute(query)
-        return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
+        return Response(json.dumps(cursor.fetchall(), separators=(',', ':')), mimetype='application/json')
 
 
 @app.route('/timeframe_granularity/<int:fgcid>/<int:frame>/<int:granularity>')
@@ -91,13 +94,13 @@ def timeframe_granularity(fgcid, frame, granularity):
         query = '''select lat, lon, count(*) as weight from (
                             select round({0} + ify, {1}) as lat,
                                    round({2} + ifx, {1}) as lon
-                            from "TUK3_TS_MJ"."FRAMEFORMAT2"
+                            from "TUK3_TS_MJ"."FRAME_FORMAT_15"
                             where fgcid = {3}
                             and {0} is not NULL)
                         group by lat, lon'''.format(lat, granularity, lon, fgcid)
 
         cursor.execute(query)
-        return Response(json.dumps(cursor.fetchall()), mimetype='application/json')
+        return Response(json.dumps(cursor.fetchall(), separators=(',', ':')), mimetype='application/json')
 
 @app.route('/route/<int:tid>')
 def route_information(tid):
@@ -109,7 +112,7 @@ def route_information(tid):
 
         cursor.execute(query)
         result = cursor.fetchall()
-        return Response(json.dumps([('{0.hour:02d}:{0.minute:02d}:{0.second:02d}'.format(x[0]),x[1],x[2],x[3]) for x in result]), mimetype='application/json')
+        return Response(json.dumps([('{0.hour:02d}:{0.minute:02d}:{0.second:02d}'.format(x[0]),x[1],x[2],x[3]) for x in result], separators=(',', ':')), mimetype='application/json')
 
 @app.route('/key_value/<int:hour>')
 def key_value(hour):
@@ -131,8 +134,21 @@ def key_value(hour):
             if match:
                 results.append([float(match.group(1)), float(match.group(2)), 1])
         print("matched")
-        return Response(json.dumps(results), mimetype='application/json')
+        return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/changepoints/<mode>/<int:fgcid>/<int:granularity>')
+def changepoints(mode, fgcid, granularity):
+    with Cursor(SCHEMA_NAME) as cursor:
+        results = []
+
+        compare_direction = '>' if mode == 'pickup' else  '<'
+
+        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', ?)
+                '''.format(fgcid, granularity, compare_direction)
+        cursor.execute(query)
+        results = cursor.fetchall()
+        print(results)
+        return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
 
 def _convert_timestamp(ts):
     if isinstance(ts, datetime.datetime):
