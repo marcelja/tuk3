@@ -15,7 +15,7 @@ def main():
 
 def _get_ids():
     with Cursor(SCHEMA_NAME) as cursor:
-        cursor.execute('select distinct id from "TAXI"."SHENZHEN"')
+        cursor.execute('select distinct id from "SHENZHEN"')
         ids = cursor.fetchall()
         return ids
 
@@ -42,7 +42,7 @@ def worker_thread(ids, begin, end):
             current_id = ids[counter][0]
 
             # print('Working on id {}'.format(current_id))
-            cursor.execute('select seconds, lon, lat, occupancy from shenzhen_seconds where id={} order by seconds'.format(current_id))
+            cursor.execute('select seconds, lon, lat, occupancy from shenzhen where id={} order by seconds'.format(current_id))
             data = cursor.fetchall()
 
             try:

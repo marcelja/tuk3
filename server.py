@@ -106,7 +106,7 @@ def timeframe_granularity(fgcid, frame, granularity):
 def route_information(tid):
     with Cursor(SCHEMA_NAME) as cursor:
         query = '''select timestamp,lon,lat,occupancy
-                        from shenzhen
+                        from shenzhen_clean
                         where id='{}' order by timestamp
                 '''.format(tid)
 
