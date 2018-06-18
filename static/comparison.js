@@ -5,13 +5,17 @@ window.onload = function () {
 }
 
 function initCharts() {
-  let chartNames = ['traWhole'];
+  let chartNames = ['traWhole', 'framegroup'];
   for (chartName of chartNames) {
+    let labels = ["Points", "Frame", "Key-Value"];
+    if (['framegroup'].includes(chartName)) {
+      labels.pop();
+    }
     let ctx = document.getElementById('chart-' + chartName);
     charts[chartName] = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ["Points", "Frame", "Key-Value"],
+        labels: labels,
         datasets: [{
           label: 'SQL time ms',
           backgroundColor: '#0000ff',
@@ -73,11 +77,13 @@ async function loadData(pointUrl, frameUrl, keyValueUrl) {
       results.sql[1] = data.performance.sql;
       results.python[1] = data.performance.python;
     });
-  await $.getJSON(keyValueUrl)
-    .then((data) => {
-      results.sql[2] = data.performance.sql;
-      results.python[2] = data.performance.python;
-    });
+  if (keyValueUrl) {
+    await $.getJSON(keyValueUrl)
+      .then((data) => {
+        results.sql[2] = data.performance.sql;
+        results.python[2] = data.performance.python;
+      });
+  }
   return results;
 }
 
