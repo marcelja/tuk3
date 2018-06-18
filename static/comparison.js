@@ -95,6 +95,19 @@ async function showTraWhole() {
 
 function loadTraWhole(trajectoryId) {
   return loadData('/trajectory_point/' + trajectoryId,
-                        '/trajectory_frame/' + trajectoryId,
-                        '/trajectory_keyvalue/' + trajectoryId);
+  '/trajectory_frame/' + trajectoryId,
+  '/trajectory_keyvalue/' + trajectoryId);
+}
+
+async function showFramegroup() {
+  let framegroup = parseInt($('#input-framegroup').val());
+  let granularity = parseInt($('#input-granularity').val());
+  
+  let data = await loadFramegroup(framegroup, granularity);
+  showChart('framegroup', data);
+}
+
+function loadFramegroup(framegroup, granularity) {
+  return loadData('/timeframe_granularity/' + framegroup + '/0/' + granularity,
+                  '/timeframe_granularity/' + framegroup + '/0/' + granularity);
 }

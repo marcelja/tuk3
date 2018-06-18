@@ -132,7 +132,17 @@ def timeframe_granularity(fgcid, frame, granularity):
                         group by lat, lon'''.format(lat, granularity, lon, fgcid)
 
         cursor.execute(query)
-        return Response(json.dumps(cursor.fetchall(), separators=(',', ':')), mimetype='application/json')
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
 @app.route('/route/<int:tid>')
 def route_information(tid):
@@ -175,12 +185,19 @@ def changepoints(mode, fgcid, granularity):
 
         compare_direction = '>' if mode == 'pickup' else  '<'
 
-        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', ?)
-                '''.format(fgcid, granularity, compare_direction)
+        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', ?)'''.format(fgcid, granularity, compare_direction)
         cursor.execute(query)
         results = cursor.fetchall()
 
-        return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": 0
+            },
+            "result": results
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
 @app.route('/profit')
 def profit():
