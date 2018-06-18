@@ -25,6 +25,7 @@ var gradient = [
 window.onload = function() {
   loadScript();
   initSlider();
+  loadProfitTable();
 }
 
 function initSlider() {
@@ -284,6 +285,36 @@ function clearPaths() {
     path = null;
   }
   markers = [];
+}
+
+function loadProfitTable() {
+  $.getJSON('/profit', (profitData) => {
+    let table = $('#profit-table')[0];
+    for(entry of profitData) {
+      let row = table.tBodies[0].insertRow(table.length);
+      let trajectoryID = document.createTextNode(entry[0]);
+      let totalProfit = document.createTextNode(entry[1].toFixed(2));
+      let numTours = document.createTextNode(entry[4] / 11);
+      let distance = document.createTextNode((entry[2] / 2.4).toFixed(1));
+
+      row.insertCell(0).appendChild(trajectoryID);
+      row.insertCell(1).appendChild(totalProfit);
+      row.insertCell(2).appendChild(numTours);
+      row.insertCell(3).appendChild(distance);
+    }
+
+    $(table).DataTable({
+      paging: false,
+      searching: false,
+      bInfo: false,
+    }).order([1, 'desc']).draw();
+
+    $('#profit-table td').on('click', (event) => {
+      let trajectoryId = parseInt($(event.target).parent().find('td:first-child').text());
+      drawRoute(trajectoryId);
+      toggleProfitOverlay();
+    });
+  });
 }
 
 function loadScript() {

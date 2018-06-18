@@ -63,10 +63,10 @@ body {
 
 #profit-overlay {
     position: absolute;
-    right: -25rem;
+    right: -35rem;
     top: 6rem;
     z-index: 6;
-    width: 25rem;
+    width: 35rem;
     background-color: #ffffff;
     padding: 0.5rem 3rem 0.5rem 0.5rem;
     border-top-left-radius: 0.5rem;
@@ -81,7 +81,7 @@ body {
 }
 #profit-overlay.hidden {
     transition: 500ms;
-    right: -25rem;
+    right: -35rem;
 }
 #profit-overly h4 {
     flex: initial;
@@ -99,4 +99,14 @@ body {
     border-top-right-radius: 0rem;
     border-bottom-right-radius: 0rem;
     /* background-color: #ffffff; */
+}
+
+#profit-overlay th,
+#profit-overlay td:first-child,
+#profit-overlay td:nth-child(3) {
+    text-align: center;
+}
+#profit-overlay td:nth-child(2),
+#profit-overlay td:nth-child(4) {
+    text-align: right;
 }

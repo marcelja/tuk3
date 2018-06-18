@@ -154,6 +154,17 @@ def changepoints(mode, fgcid, granularity):
 
         return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/profit')
+def profit():
+    with Cursor(SCHEMA_NAME) as cursor:
+        results = []
+
+        query = "SELECT * FROM profit ORDER by profit DESC LIMIT 100;"
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
+
 def _convert_timestamp(ts):
     if isinstance(ts, datetime.datetime):
         return str(ts)
