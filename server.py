@@ -147,7 +147,7 @@ def changepoints(mode, fgcid, granularity):
                 '''.format(fgcid, granularity, compare_direction)
         cursor.execute(query)
         results = cursor.fetchall()
-        print(results)
+
         return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
 
 def _convert_timestamp(ts):
