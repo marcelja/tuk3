@@ -295,7 +295,7 @@ function loadScript() {
     document.body.appendChild(script);
     // wait for google script to load
     setTimeout(function(){
-      // drawRoute(22223);
+      onSliderChanged();
     }, 2000);
   });
 }
