@@ -16,6 +16,10 @@ FRAME_GROUP_SIZE = 10  # minutes
 def index():
     return render_template('map.html')
 
+@app.route('/compare')
+def compare():
+    return render_template('compare.html')
+
 
 @app.route('/trajectory_point/<int:tid>')
 def trajectory_point(tid):

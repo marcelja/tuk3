@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Format Comparision</title>
+    <link href="{{ url_for('static', filename='bootstrap-4.1.0/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='comparison.css') }}" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <h1>Format Comparison</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <h4>Whole Trajectory</h4>
+                <div class="form-inline">
+                    <div class="input-group input-group-sm mr-1">
+                        <input class="form-control" type="number" placeholder="Trajectory ID">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary">Start</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                        <canvas id="chart-tra-whole"></canvas>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap-4.1.0/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='Chart.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='comparison.js') }}"></script>
+  </body>
+</html>
