@@ -19,14 +19,29 @@
                 <h4>Whole Trajectory</h4>
                 <div class="form-inline">
                     <div class="input-group input-group-sm mr-1">
-                        <input class="form-control" type="number" placeholder="Trajectory ID">
+                        <input id="input-traWhole" class="form-control" type="number" placeholder="Trajectory ID">
                         <div class="input-group-append">
-                            <button class="btn btn-secondary">Start</button>
+                            <button class="btn btn-secondary" onclick="showTraWhole()">Start</button>
                         </div>
                     </div>
                 </div>
                 <div class="chart-container">
-                        <canvas id="chart-tra-whole"></canvas>
+                        <canvas id="chart-traWhole"></canvas>
+                    </div>
+            </div>
+            <div class="col-4">
+                <h4>Time Frame</h4>
+                <div class="form-inline">
+                    <div class="input-group input-group-sm mr-1">
+                        <input id="input-framegroup" class="form-control" type="number" placeholder="Framegroup">
+                        <input id="input-granularity" class="form-control" type="number" placeholder="Granularity">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" onclick="showFramegroup()">Start</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                        <canvas id="chart-framegroup"></canvas>
                     </div>
             </div>
         </div>

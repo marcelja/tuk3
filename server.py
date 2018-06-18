@@ -11,7 +11,6 @@ SCHEMA_NAME = 'TUK3_TS_MJ'
 FRAME_SIZE = 15  # seconds
 FRAME_GROUP_SIZE = 10  # minutes
 
-
 @app.route('/')
 def index():
     return render_template('map.html')
@@ -26,40 +25,22 @@ def trajectory_point(tid):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
         query = '''select lat, lon, timestamp
-                   from "TAXI"."SHENZHEN"
+                   from shenzhen_clean
                    where id = {}
                    order by timestamp'''.format(tid)
         cursor.execute(query)
-        return Response(json.dumps(cursor.fetchall(),
-                                   default=_convert_timestamp, separators=(',', ':')),
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": 0
+            },
+            "result": cursor.fetchall()
+        }
+        return Response(json.dumps(response,
+                                default=_convert_timestamp,
+                                separators=(',', ':')),
                         mimetype='application/json')
-
-
-@app.route('/trajectory_frame/<int:tid>')
-def trajectory_frame(tid):
-    # Must be in range 22223 <= TID <= 36950
-    with Cursor(SCHEMA_NAME) as cursor:
-        # Layout: tid, fgcid, ifx, ify, pf0px, pf0py, ...
-        query = 'select tid, fgcid, ifx, ify'
-        for i in range(40):
-            query += ', pf0px, pf1px'
-        query += ''' from "TUK3_TS_MJ"."FRAME_FORMAT_15"
-                   where tid = {}
-                   order by fgcid'''.format(tid)
-        cursor.execute(query)
-        query_result = cursor.fetchall()
-        result = []
-        for framegroup in query_result:
-            ifx = framegroup[2]
-            ify = framegroup[3]
-            for frame in range(int(60 / FRAME_SIZE) * FRAME_GROUP_SIZE):
-                index = 4 + 2 * frame
-                if framegroup[index] is not None:
-                    result.append([framegroup[index + 1] + ify,
-                                   framegroup[index] + ifx,
-                                   _get_timestamp(framegroup[1], frame)])
-        return Response(json.dumps(result, separators=(',', ':')), mimetype='application/json')
-
 
 @app.route('/trajectory_keyvalue/<int:tid>')
 def trajectory_keyvalue(tid):
@@ -70,9 +51,56 @@ def trajectory_keyvalue(tid):
         cursor.execute(query)
         result_tuple = cursor.fetchone()
         # tuple contains only one selected value
+        start = time.clock()
         trajectory_object = result_tuple[0].read()
-        return Response(json.dumps(json.loads(trajectory_object), separators=(',', ':')),
+        end = time.clock()
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": calc_execution_time(start, end)
+            },
+            "result": json.loads(trajectory_object)
+        }
+        return Response(json.dumps(response, separators=(',', ':')),
                         mimetype='application/json')
+
+@app.route('/trajectory_frame/<int:tid>')
+def trajectory_frame(tid):
+    # Must be in range 22223 <= TID <= 36950
+    with Cursor(SCHEMA_NAME) as cursor:
+        # Layout: tid, fgcid, ifx, ify, pf0px, pf0py, ...
+        query = 'select tid, fgcid, ifx, ify'
+        for i in range(40):
+            query += ', pf{0}px, pf{0}py'.format(i)
+        query += ''' from "TUK3_TS_MJ"."FRAME_FORMAT_15"
+                   where tid = {}
+                   order by fgcid'''.format(tid)
+        cursor.execute(query)
+        query_result = cursor.fetchall()
+        result = []
+        start = time.clock()
+        for framegroup in query_result:
+            ifx = framegroup[2]
+            ify = framegroup[3]
+            for frame in range(int(60 / FRAME_SIZE) * FRAME_GROUP_SIZE):
+                index = 4 + 2 * frame
+                if framegroup[index] is not None:
+                    result.append([framegroup[index + 1] + ify,
+                                   framegroup[index] + ifx,
+                                   _get_timestamp(framegroup[1], frame)])
+        end = time.clock()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": calc_execution_time(start, end)
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 
 
 @app.route('/timeframe/<int:fgcid>/<int:frame>')
@@ -104,7 +132,17 @@ def timeframe_granularity(fgcid, frame, granularity):
                         group by lat, lon'''.format(lat, granularity, lon, fgcid)
 
         cursor.execute(query)
-        return Response(json.dumps(cursor.fetchall(), separators=(',', ':')), mimetype='application/json')
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
 @app.route('/route/<int:tid>')
 def route_information(tid):
@@ -147,12 +185,19 @@ def changepoints(mode, fgcid, granularity):
 
         compare_direction = '>' if mode == 'pickup' else  '<'
 
-        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', ?)
-                '''.format(fgcid, granularity, compare_direction)
+        query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', ?)'''.format(fgcid, granularity, compare_direction)
         cursor.execute(query)
         results = cursor.fetchall()
 
-        return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": 0
+            },
+            "result": results
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
 @app.route('/profit')
 def profit():
@@ -173,6 +218,22 @@ def _convert_timestamp(ts):
 def _get_timestamp(fgcid, frame):
     seconds = fgcid * FRAME_GROUP_SIZE * 60 + frame * FRAME_SIZE
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(seconds))
+
+def get_sql_execution_time(query):
+    with Cursor(SCHEMA_NAME) as cursor:
+        results = []
+
+        query = '''SELECT MIN_EXECUTION_TIME 
+                    FROM SYS.M_SQL_PLAN_CACHE 
+                    WHERE STATEMENT_STRING LIKE '{}' 
+                    ORDER BY LAST_EXECUTION_TIMESTAMP DESC
+                '''.format(query)
+        cursor.execute(query)
+        results = cursor.fetchone()
+        return float(results[0]) / 1000 # convert to ms
+
+def calc_execution_time(start, end):
+    return round((end - start) * 1000, 3)
 
 
 if __name__ == '__main__':

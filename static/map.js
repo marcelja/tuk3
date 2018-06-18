@@ -121,7 +121,7 @@ function loadHeatmap(mapType, time, granularity) {
   $.getJSON(url, (data) => {
     let loadingTime = new Date().getTime() - startTime;
     $('#loadingTime').text(loadingTime + ' ms');
-    let heatmapData = formatHeatmapData(data);
+    let heatmapData = formatHeatmapData(data.result);
     heatmap.setData(heatmapData);
   });
 }

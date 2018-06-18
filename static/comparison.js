@@ -1,30 +1,113 @@
 charts = {};
 
 window.onload = function () {
-    initCharts();
+  initCharts();
 }
 
 function initCharts() {
-    let traWholeCtx = document.getElementById('chart-tra-whole');
-    charts.traWhole = new Chart(traWholeCtx, {
-        type: 'bar',
-        data: {
-            labels: ["Points", "Frame", "Key-Value"],
-            datasets: [{
-                label: 'Execution time ms',
-                data: [],
-                borderWidth: 1
-            }]
+  let chartNames = ['traWhole', 'framegroup'];
+  for (chartName of chartNames) {
+    let labels = ["Points", "Frame", "Key-Value"];
+    if (['framegroup'].includes(chartName)) {
+      labels.pop();
+    }
+    let ctx = document.getElementById('chart-' + chartName);
+    charts[chartName] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'SQL time ms',
+          backgroundColor: '#0000ff',
+          data: [],
+          borderWidth: 1
+        },{
+          label: 'Python time ms',
+          backgroundColor: '#ff0000',
+          data: [],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            },
+            stacked: true
+          }],
+          xAxes: [{
+            stacked: true
+          }],
         },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
-                }]
-            }
+        tooltips: {
+          mode: 'index',
+          intersect: false,
         }
+      }
     });
+  }
+}
 
+function clearDataSets(chart) {
+  for (dataset of charts[chart].data.datasets) {
+    dataset.data = [];
+  }
+}
+
+function showChart(chartName, data) {
+  clearDataSets(chartName);
+  charts[chartName].data.datasets[0].data = data.sql;
+  charts[chartName].data.datasets[1].data = data.python;
+  charts[chartName].update();
+}
+
+async function loadData(pointUrl, frameUrl, keyValueUrl) {
+  let results = {
+    sql: [],
+    python: []
+  };
+  await $.getJSON(pointUrl)
+    .then((data) => {
+      results.sql[0] = data.performance.sql;
+      results.python[0] = data.performance.python;
+    });
+  await $.getJSON(frameUrl)
+    .then((data) => {
+      results.sql[1] = data.performance.sql;
+      results.python[1] = data.performance.python;
+    });
+  if (keyValueUrl) {
+    await $.getJSON(keyValueUrl)
+      .then((data) => {
+        results.sql[2] = data.performance.sql;
+        results.python[2] = data.performance.python;
+      });
+  }
+  return results;
+}
+
+async function showTraWhole() {
+  let trajectoryId = parseInt($('#input-traWhole').val());
+  let data = await loadTraWhole(trajectoryId);
+  showChart('traWhole', data);
+}
+
+function loadTraWhole(trajectoryId) {
+  return loadData('/trajectory_point/' + trajectoryId,
+  '/trajectory_frame/' + trajectoryId,
+  '/trajectory_keyvalue/' + trajectoryId);
+}
+
+async function showFramegroup() {
+  let framegroup = parseInt($('#input-framegroup').val());
+  let granularity = parseInt($('#input-granularity').val());
+  
+  let data = await loadFramegroup(framegroup, granularity);
+  showChart('framegroup', data);
+}
+
+function loadFramegroup(framegroup, granularity) {
+  return loadData('/timeframe_granularity/' + framegroup + '/0/' + granularity,
+                  '/timeframe_granularity/' + framegroup + '/0/' + granularity);
 }
