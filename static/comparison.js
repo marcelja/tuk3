@@ -16,7 +16,7 @@ function initCharts() {
       labels: ['Points', 'Points sorted', 'Frame']
     },
     profit: {
-      labels: ['Points', 'Key-Value']
+      labels: ['Points', 'Points sorted']
     }
   };
   for (chartName in chartDetails) {
@@ -145,5 +145,5 @@ async function showProfit() {
 
 function loadProfit(trajectoryId) {
   return loadData('/profit/' + trajectoryId,
-                  '/profit_keyvalue/' + trajectoryId);
+                  '/profit_sorted/' + trajectoryId);
 }
