@@ -5,10 +5,10 @@ window.onload = function () {
 }
 
 function initCharts() {
-  let chartNames = ['traWhole', 'framegroup'];
+  let chartNames = ['traWhole', 'framegroup', 'changepoints'];
   for (chartName of chartNames) {
     let labels = ["Points", "Frame", "Key-Value"];
-    if (['framegroup'].includes(chartName)) {
+    if (['framegroup', 'changepoints'].includes(chartName)) {
       labels.pop();
     }
     let ctx = document.getElementById('chart-' + chartName);
@@ -108,6 +108,20 @@ async function showFramegroup() {
 }
 
 function loadFramegroup(framegroup, granularity) {
-  return loadData('/timeframe_granularity/' + framegroup + '/0/' + granularity,
+  return loadData('/timeframe_granularity_points/' + framegroup + '/' + granularity,
                   '/timeframe_granularity/' + framegroup + '/0/' + granularity);
+}
+
+async function showChangepoints() {
+  let framegroup = parseInt($('#input-changepoints-framegroup').val());
+  let granularity = parseInt($('#input-changepoints-granularity').val());
+  let mode = $('[name="input-changepoints-mode"]:checked').val();
+  
+  let data = await loadChangepoints(framegroup, granularity, mode);
+  showChart('changepoints', data);
+}
+
+function loadChangepoints(framegroup, granularity, mode) {
+  return loadData('/changepoints_points/' + mode + '/' + framegroup + '/' + granularity,
+                  '/changepoints/' + mode + '/' + framegroup + '/' + granularity);
 }

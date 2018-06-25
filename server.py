@@ -144,6 +144,36 @@ def timeframe_granularity(fgcid, frame, granularity):
         }
         return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/timeframe_granularity_points/<int:fgcid>/<int:granularity>')
+def timeframe_granularity_points(fgcid, granularity):
+    with Cursor(SCHEMA_NAME) as cursor:
+        start = time.clock()
+        seconds = fgcid * 10 * 60
+        end = time.clock()
+        query =  '''SELECT lat, lon, count(*) from (
+                    SELECT 
+                        round(lat, {2}) as lat, 
+                        round(lon, {2}) as lon 
+                    FROM shenzhen_clean 
+                    WHERE 
+                        seconds >= {0} 
+                        AND seconds <= {1} 
+                        AND lat IS NOT NULL
+                ) GROUP BY lat, lon'''.format(seconds, seconds + 15, granularity)
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": calc_execution_time(start, end)
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 @app.route('/route/<int:tid>')
 def route_information(tid):
     with Cursor(SCHEMA_NAME) as cursor:
@@ -183,7 +213,9 @@ def changepoints(mode, fgcid, granularity):
     with Cursor(SCHEMA_NAME) as cursor:
         results = []
 
+        start = time.clock()
         compare_direction = '>' if mode == 'pickup' else  '<'
+        end = time.clock()
 
         query = '''CALL TUK3_TS_MJ.changepoints_for_framegroup({0}, {1}, '{2}', ?)'''.format(fgcid, granularity, compare_direction)
         cursor.execute(query)
@@ -193,7 +225,32 @@ def changepoints(mode, fgcid, granularity):
             "performance": {
                 "query": query,
                 "sql": get_sql_execution_time(query.replace("'", "''")),
-                "python": 0
+                "python": calc_execution_time(start, end)
+            },
+            "result": results
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
+@app.route('/changepoints_points/<mode>/<int:fgcid>/<int:granularity>')
+def changepoints_poinnts(mode, fgcid, granularity):
+    with Cursor(SCHEMA_NAME) as cursor:
+        results = []
+
+        start = time.clock()
+        compare_direction = '>' if mode == 'pickup' else  '<'
+        framebegin = fgcid * 10 * 60
+        framelength = 600
+        end = time.clock()
+
+        query = '''CALL TUK3_TS_MJ.changepoints_for_point_format({0}, {1}, {2}, '{3}', ?)'''.format(framebegin, framelength, granularity, compare_direction)
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": calc_execution_time(start, end)
             },
             "result": results
         }
