@@ -5,22 +5,26 @@ window.onload = function () {
 }
 
 function initCharts() {
-  let chartNames = ['traWhole', 'framegroup', 'changepoints', 'profit'];
-  for (chartName of chartNames) {
-    let labels = ["Points", "Frame", "Key-Value"];
-    if (['framegroup', 'changepoints'].includes(chartName)) {
-      labels.pop();
+  let chartDetails = {
+    traWhole: {
+      labels: ['Points', 'Frame', 'Key-Value']
+    },
+    framegroup: {
+      labels: ['Points', 'Frame']
+    },
+    changepoints: {
+      labels: ['Points', 'Points sorted', 'Frame']
+    },
+    profit: {
+      labels: ['Points', 'Key-Value']
     }
-    if (['profit'].includes(chartName)) {
-      labels = labels.filter((label) => {
-        return label != 'Frame';
-      });
-    }
+  };
+  for (chartName in chartDetails) {
     let ctx = document.getElementById('chart-' + chartName);
     charts[chartName] = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: chartDetails[chartName].labels,
         datasets: [{
           label: 'SQL time ms',
           backgroundColor: '#0000ff',
@@ -128,6 +132,7 @@ async function showChangepoints() {
 
 function loadChangepoints(framegroup, granularity, mode) {
   return loadData('/changepoints_points/' + mode + '/' + framegroup + '/' + granularity,
+                  '/changepoints_points_sorted/' + mode + '/' + framegroup + '/' + granularity,
                   '/changepoints/' + mode + '/' + framegroup + '/' + granularity);
 }
 

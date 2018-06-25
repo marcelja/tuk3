@@ -256,6 +256,31 @@ def changepoints_poinnts(mode, fgcid, granularity):
         }
         return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/changepoints_points_sorted/<mode>/<int:fgcid>/<int:granularity>')
+def changepoints_points_sorted(mode, fgcid, granularity):
+    with Cursor(SCHEMA_NAME) as cursor:
+        results = []
+
+        start = time.clock()
+        compare_direction = '>' if mode == 'pickup' else  '<'
+        framebegin = fgcid * 10 * 60
+        framelength = 600
+        end = time.clock()
+
+        query = '''CALL TUK3_TS_MJ.changepoints_for_point_format_toni({0}, {1}, {2}, '{3}', ?)'''.format(framebegin, framelength, granularity, compare_direction)
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": calc_execution_time(start, end)
+            },
+            "result": results
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 @app.route('/profit')
 def profit():
     with Cursor(SCHEMA_NAME) as cursor:
