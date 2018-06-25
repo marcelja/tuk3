@@ -108,6 +108,6 @@ async function showFramegroup() {
 }
 
 function loadFramegroup(framegroup, granularity) {
-  return loadData('/timeframe_granularity/' + framegroup + '/0/' + granularity,
+  return loadData('/timeframe_granularity_points/' + framegroup + '/' + granularity,
                   '/timeframe_granularity/' + framegroup + '/0/' + granularity);
 }

@@ -144,6 +144,36 @@ def timeframe_granularity(fgcid, frame, granularity):
         }
         return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/timeframe_granularity_points/<int:fgcid>/<int:granularity>')
+def timeframe_granularity_points(fgcid, granularity):
+    with Cursor(SCHEMA_NAME) as cursor:
+        start = time.clock()
+        seconds = fgcid * 10 * 60
+        end = time.clock()
+        query =  '''SELECT lat, lon, count(*) from (
+                    SELECT 
+                        round(lat, {2}) as lat, 
+                        round(lon, {2}) as lon 
+                    FROM shenzhen_clean 
+                    WHERE 
+                        seconds >= {0} 
+                        AND seconds <= {1} 
+                        AND lat IS NOT NULL
+                ) GROUP BY lat, lon'''.format(seconds, seconds + 15, granularity)
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": calc_execution_time(start, end)
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 @app.route('/route/<int:tid>')
 def route_information(tid):
     with Cursor(SCHEMA_NAME) as cursor:
