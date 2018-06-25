@@ -110,7 +110,7 @@ def worker_thread(ids, begin, end, frame_duration, procedure, directory):
 
             _write_line_to_file(_fill_line(line), filename)
             begin += 1
-        print('HANA time: {}'.format(time_counter, directory))
+        print('HANA time: {}, {}'.format(time_counter, directory))
 
 
 def _fill_line(line):
