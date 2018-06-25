@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>Format Comparision</title>
     <link href="{{ url_for('static', filename='bootstrap-4.1.0/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='comparison.css') }}" rel="stylesheet">
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="container-fluid">
         <div class="row">
             <div class="col">
@@ -26,8 +27,8 @@
                     </div>
                 </div>
                 <div class="chart-container">
-                        <canvas id="chart-traWhole"></canvas>
-                    </div>
+                    <canvas id="chart-traWhole"></canvas>
+                </div>
             </div>
             <div class="col-4">
                 <h4>Time Frame</h4>
@@ -41,8 +42,8 @@
                     </div>
                 </div>
                 <div class="chart-container">
-                        <canvas id="chart-framegroup"></canvas>
-                    </div>
+                    <canvas id="chart-framegroup"></canvas>
+                </div>
             </div>
             <div class="col-4">
                 <h4>Changepoints</h4>
@@ -52,7 +53,8 @@
                         <input id="input-changepoints-granularity" class="form-control" type="number" placeholder="Granularity">
                         <div class="input-group-append">
                             <div class="input-group-text">
-                                <input type="radio" class="form-check-input" name="input-changepoints-mode" id="input-changepoints-pickup" value="pickup" checked>
+                                <input type="radio" class="form-check-input" name="input-changepoints-mode" id="input-changepoints-pickup" value="pickup"
+                                    checked>
                                 <label class="form-check-label mr-2" for="input-changepoints-pickup">
                                     Pickup
                                 </label>
@@ -66,8 +68,24 @@
                     </div>
                 </div>
                 <div class="chart-container">
-                        <canvas id="chart-changepoints"></canvas>
+                    <canvas id="chart-changepoints"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <h4>Profit</h4>
+                <div class="form-inline">
+                    <div class="input-group input-group-sm mr-1">
+                        <input id="input-profit" class="form-control" type="number" placeholder="Trajectory ID">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" onclick="showProfit()">Start</button>
+                        </div>
                     </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-profit"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -76,5 +94,6 @@
     <script src="{{ url_for('static', filename='bootstrap-4.1.0/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='Chart.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='comparison.js') }}"></script>
-  </body>
+</body>
+
 </html>

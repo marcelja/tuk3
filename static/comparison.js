@@ -5,17 +5,26 @@ window.onload = function () {
 }
 
 function initCharts() {
-  let chartNames = ['traWhole', 'framegroup', 'changepoints'];
-  for (chartName of chartNames) {
-    let labels = ["Points", "Frame", "Key-Value"];
-    if (['framegroup', 'changepoints'].includes(chartName)) {
-      labels.pop();
+  let chartDetails = {
+    traWhole: {
+      labels: ['Points', 'Frame', 'Key-Value']
+    },
+    framegroup: {
+      labels: ['Points', 'Frame']
+    },
+    changepoints: {
+      labels: ['Points', 'Points sorted', 'Frame']
+    },
+    profit: {
+      labels: ['Points', 'Key-Value']
     }
+  };
+  for (chartName in chartDetails) {
     let ctx = document.getElementById('chart-' + chartName);
     charts[chartName] = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: chartDetails[chartName].labels,
         datasets: [{
           label: 'SQL time ms',
           backgroundColor: '#0000ff',
@@ -123,5 +132,18 @@ async function showChangepoints() {
 
 function loadChangepoints(framegroup, granularity, mode) {
   return loadData('/changepoints_points/' + mode + '/' + framegroup + '/' + granularity,
+                  '/changepoints_points_sorted/' + mode + '/' + framegroup + '/' + granularity,
                   '/changepoints/' + mode + '/' + framegroup + '/' + granularity);
+}
+
+async function showProfit() {
+  let trajectoryId = parseInt($('#input-profit').val());
+  
+  let data = await loadProfit(trajectoryId);
+  showChart('profit', data);
+}
+
+function loadProfit(trajectoryId) {
+  return loadData('/profit/' + trajectoryId,
+                  '/profit_keyvalue/' + trajectoryId);
 }
