@@ -44,6 +44,31 @@
                         <canvas id="chart-framegroup"></canvas>
                     </div>
             </div>
+            <div class="col-4">
+                <h4>Changepoints</h4>
+                <div class="form-inline">
+                    <div class="input-group input-group-sm mr-1">
+                        <input id="input-changepoints-framegroup" class="form-control" type="number" placeholder="Framegroup">
+                        <input id="input-changepoints-granularity" class="form-control" type="number" placeholder="Granularity">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <input type="radio" class="form-check-input" name="input-changepoints-mode" id="input-changepoints-pickup" value="pickup" checked>
+                                <label class="form-check-label mr-2" for="input-changepoints-pickup">
+                                    Pickup
+                                </label>
+                                <input type="radio" class="form-check-input" name="input-changepoints-mode" id="input-changepoints-dropoff" value="dropoff">
+                                <label class="form-check-label" for="input-changepoints-dropoff">
+                                    Dropoff
+                                </label>
+                            </div>
+                            <button class="btn btn-secondary" onclick="showChangepoints()">Start</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                        <canvas id="chart-changepoints"></canvas>
+                    </div>
+            </div>
         </div>
     </div>
 
