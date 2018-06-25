@@ -10,7 +10,7 @@ END;
 
 drop procedure TUK3_TS_MJ.changepoints_for_point_format;
 
-create procedure TUK3_TS_MJ.changepoints_for_point_format(in fgcidin int, in granularity int, in pointtype char, out output_table TUK3_TS_MJ.changepointstype)
+create procedure TUK3_TS_MJ.changepoints_for_point_format(in framebegin int, in framelength tinyint, in granularity tinyint, in pointtype char, out output_table TUK3_TS_MJ.changepointstype)
 LANGUAGE SQLSCRIPT AS
  BEGIN 
     
@@ -22,11 +22,13 @@ if :pointtype = '>' then
     from 
         (select id, lat, lon, occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num
         from shenzhen_clean
-        --where get_timeframe_from_seconds(seconds) = fgcidin
+        where seconds >= framebegin
+        and seconds < framebegin + framelength
         order by seconds) t1,
         (select id, lat, lon, occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num
         from shenzhen_clean 
-        --where get_timeframe_from_seconds(seconds) = fgcidin
+        where seconds >= framebegin
+        and seconds < framebegin + framelength
         order by seconds) t2
     where t1.row_num = t2.row_num-1
     and t1.occupancy=1
@@ -43,8 +45,12 @@ else
     from 
         (select id, lat, lon, occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num
         from shenzhen_clean
+        where seconds >= framebegin
+        and seconds < framebegin + framelength
         order by seconds) t1,
         (select id, lat, lon, occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num from shenzhen_clean 
+        where seconds >= framebegin
+        and seconds < framebegin + framelength
         order by seconds) t2
     where t1.row_num = t2.row_num-1
     and t1.occupancy=0
@@ -56,5 +62,5 @@ end if;
 
 end;
 
--- call changepoints_for_point_format(1, 2, '>', ?)
+-- call changepoints_for_point_format(50000, 600, 6, '>', ?);
     
