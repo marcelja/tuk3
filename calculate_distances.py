@@ -92,6 +92,9 @@ def _calculate_total_distance(data, current_id, cursor):
             current_distance += _calculate_distance(last_point, current_point)
         last_point = current_point
 
+    if occupancy == 1:
+        _insert_distance(current_id, current_distance, start_time, row[0], cursor)
+
 
 def _timestamp_to_seconds(element):
     time_list = element[-8:].split(':')
