@@ -2,6 +2,7 @@ import os
 from threading import Thread
 from cursor import Cursor
 import geopy.distance
+import ast
 
 
 SCHEMA_NAME = 'TUK3_TS_MJ'
@@ -10,7 +11,8 @@ THREADS = 8
 
 def main():
     ids = _get_ids()
-    _start_threads(ids)
+    _start_threads(ids, 'key-value-format')
+    # _start_threads(ids, 'point-format')
 
 
 def _get_ids():
@@ -20,19 +22,19 @@ def _get_ids():
         return ids
 
 
-def _start_threads(ids):
+def _start_threads(ids, table_format):
     ids_per_thread = len(ids) / THREADS
     threads = []
     for i in range(THREADS):
         id_offset_begin = int(i * ids_per_thread)
         id_offset_end = int(i * ids_per_thread + ids_per_thread - 1)
-        thread = Thread(target=worker_thread, args=(ids, id_offset_begin, id_offset_end))
+        thread = Thread(target=worker_thread, args=(ids, id_offset_begin, id_offset_end, table_format))
         threads.append(thread)
         thread.start()
     [t.join() for t in threads]
 
 
-def worker_thread(ids, begin, end):
+def worker_thread(ids, begin, end, table_format):
     with Cursor(SCHEMA_NAME) as cursor:
         filename = 'distance-{}-{}.csv'.format(begin, end)
         print('Starting thread from {} to {}'.format(begin, end))
@@ -42,10 +44,19 @@ def worker_thread(ids, begin, end):
             current_id = ids[counter][0]
 
             # print('Working on id {}'.format(current_id))
-            cursor.execute('select seconds, lon, lat, occupancy from shenzhen where id={} order by seconds'.format(current_id))
+            if table_format == 'point-format':
+                cursor.execute('select seconds, lon, lat, occupancy from shenzhen where id={} order by seconds'.format(current_id))
+            elif table_format == 'key-value-format':
+                cursor.execute('select obj from key_value where id={}'.format(current_id))
+            else:
+                print('Wrong format argument')
+
             data = cursor.fetchall()
 
             try:
+                if table_format == 'key-value-format':
+                    obj_list = ast.literal_eval(data[0][0].read())
+                    data = [(_timestamp_to_seconds(x[0]), x[2], x[1], 1) for x in obj_list]
                 _calculate_total_distance(data, current_id, cursor)
             except:
                 print(current_id, "failed")
@@ -80,6 +91,11 @@ def _calculate_total_distance(data, current_id, cursor):
         elif occupancy == 1:
             current_distance += _calculate_distance(last_point, current_point)
         last_point = current_point
+
+
+def _timestamp_to_seconds(element):
+    time_list = element[-8:].split(':')
+    return int(time_list[0])*3600 + int(time_list[1])*60 + int(time_list[2]) 
 
 
 def _calculate_distance(last_point, current_point):
