@@ -11,14 +11,13 @@ helper = select
 timestamp,
     lon,
     lat,
-    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
-    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame, 
+    to_int((hour(timestamp)*3600+minute(timestamp)*60+second(timestamp))/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod(hour(timestamp)*3600+minute(timestamp)*60+second(timestamp),(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame,
     occupancy,
     speed
     from "SHENZHEN"
     where id = :id
-    order by timestamp;
-    
+    order by timestamp;        
         
 helper2 = select min(timestamp) as ts, frame
 from (
@@ -26,8 +25,8 @@ select
 timestamp,
     lon,
     lat,
-    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
-    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
+    to_int((hour(timestamp)*3600+minute(timestamp)*60+second(timestamp))/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod(hour(timestamp)*3600+minute(timestamp)*60+second(timestamp),(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
     from "SHENZHEN"
     where id = :id
     order by timestamp
@@ -53,8 +52,8 @@ helper = select
 timestamp,
     lon,
     lat,
-    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
-    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame,
+    to_int((hour(timestamp)*3600+minute(timestamp)*60+second(timestamp))/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod((hour(timestamp)*3600+minute(timestamp)*60+second(timestamp)),(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame,
     occupancy,
     speed
     from "SHENZHEN"
@@ -68,8 +67,8 @@ select
 timestamp,
     lon,
     lat,
-    to_int((hour(timestamp)*60+minute(timestamp))*60/(:frame_duration * :points_per_frame_group)) as FGCID,
-    to_int(mod((hour(timestamp)*60+minute(timestamp))*60,(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
+    to_int((hour(timestamp)*3600+minute(timestamp)*60+second(timestamp))/(:frame_duration * :points_per_frame_group)) as FGCID,
+    to_int(mod((hour(timestamp)*3600+minute(timestamp)*60+second(timestamp)),(:frame_duration * :points_per_frame_group)) / :frame_duration) as frame
     from "SHENZHEN"
     where id = :id
     order by timestamp
