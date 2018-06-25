@@ -267,6 +267,76 @@ def profit():
 
         return Response(json.dumps(results, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/profit/<int:id>')
+def profit_id(id):
+    with Cursor(SCHEMA_NAME) as cursor:
+        result = []
+
+        query = '''
+            select sum_table.id, sum_distance*2.4/1000+(sum_seconds*0.1*48/3600)+11*num_rides as profit, sum_distance*2.4/1000 as profit_distance, sum_seconds*0.1*48/3600 as profit_waiting, 11*num_rides as profit_taxi_start from
+
+            ----- calculate sum of distances and sum of seconds for each id
+            (
+                select sum(distance) as sum_distance,sum(scnds) as sum_seconds,id from
+                (
+                select t1.id, t2.seconds-t1.seconds as scnds, new ST_POINT(t1.lon, t1.lat).st_srid(4326).st_transform(4326).st_distance(  new ST_POINT(t2.lon, t2.lat).st_srid(4326).st_transform(4326)   ) as distance from 
+                (select lon,lat,seconds,id,occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num from shenzhen_clean
+                where id = {0}
+                order by seconds) t1,
+                (select lon,lat,seconds,id,occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num from shenzhen_clean 
+                where id = {0}
+                order by seconds) t2
+                where t1.row_num = t2.row_num-1 and t1.occupancy=1 and t2.occupancy=1 and t1.id=t2.id
+                ) group by id order by sum_distance desc
+            ) sum_table,
+
+            ----- calculate number of rides
+            (
+                select t1.id, count(t1.id) as num_rides from 
+                (select lon,lat,seconds,id,occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num from shenzhen_clean
+                where id = {0}
+                order by seconds) t1,
+                (select lon,lat,seconds,id,occupancy, ROW_NUMBER() OVER (PARTITION BY id order by seconds) AS row_num from shenzhen_clean 
+                where id = {0}
+                order by seconds) t2
+                where t1.row_num = t2.row_num-1 and t1.occupancy=1 and t2.occupancy=0 and t1.id=t2.id
+                group by t1.id
+            ) num_rides
+            where sum_table.id=num_rides.id
+            '''.format(id)
+        cursor.execute(query)
+        result = list(cursor.fetchone())
+        result[3] = float(result[3])
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
+@app.route('/profit_keyvalue/<int:id>')
+def profit_id_keyvalue(id):
+    with Cursor(SCHEMA_NAME) as cursor:
+        results = []
+
+        query = '''{0}'''.format(id)
+        # cursor.execute(query)
+        # result = cursor.fetchone()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": 0, #get_sql_execution_time(query.replace("'", "''")),
+                "python": 0
+            },
+            "result": results
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 def _convert_timestamp(ts):
     if isinstance(ts, datetime.datetime):
         return str(ts)

@@ -312,7 +312,7 @@ function loadProfitTable() {
     $('#profit-table td').on('click', (event) => {
       let trajectoryId = parseInt($(event.target).parent().find('td:first-child').text());
       drawRoute(trajectoryId);
-      toggleProfitOverlay();
+      $('#profit-overlay-btn').click();
     });
   });
 }

@@ -5,11 +5,16 @@ window.onload = function () {
 }
 
 function initCharts() {
-  let chartNames = ['traWhole', 'framegroup', 'changepoints'];
+  let chartNames = ['traWhole', 'framegroup', 'changepoints', 'profit'];
   for (chartName of chartNames) {
     let labels = ["Points", "Frame", "Key-Value"];
     if (['framegroup', 'changepoints'].includes(chartName)) {
       labels.pop();
+    }
+    if (['profit'].includes(chartName)) {
+      labels = labels.filter((label) => {
+        return label != 'Frame';
+      });
     }
     let ctx = document.getElementById('chart-' + chartName);
     charts[chartName] = new Chart(ctx, {
@@ -124,4 +129,16 @@ async function showChangepoints() {
 function loadChangepoints(framegroup, granularity, mode) {
   return loadData('/changepoints_points/' + mode + '/' + framegroup + '/' + granularity,
                   '/changepoints/' + mode + '/' + framegroup + '/' + granularity);
+}
+
+async function showProfit() {
+  let trajectoryId = parseInt($('#input-profit').val());
+  
+  let data = await loadProfit(trajectoryId);
+  showChart('profit', data);
+}
+
+function loadProfit(trajectoryId) {
+  return loadData('/profit/' + trajectoryId,
+                  '/profit_keyvalue/' + trajectoryId);
 }
