@@ -37,7 +37,7 @@ def create_csvs(frame_duration, procedure, ids):
 
 def _get_ids():
     with Cursor(SCHEMA_NAME) as cursor:
-        cursor.execute('select distinct id from "TAXI"."SHENZHEN"')
+        cursor.execute('select distinct id from "SHENZHEN_CLEAN" order by id')
         ids = cursor.fetchall()
         return ids
 
@@ -58,14 +58,18 @@ def _start_threads(ids, frame_duration, procedure, directory):
 def worker_thread(ids, begin, end, frame_duration, procedure, directory):
     with Cursor(SCHEMA_NAME) as cursor:
         filename = '{}/frame-{}-{}.csv'.format(directory, begin, end)
+        time_counter = 0
         while begin <= end:
             # Result is tuple
             current_id = ids[begin][0]
             # print('Working on id {}'.format(current_id))
+            starttime = time.time()
             cursor.execute('call data_for_id_speed_occupancy_{}({}, {}, {}, ?)'.format(procedure,
                                                                                        current_id,
                                                                                        frame_duration,
                                                                                        POINTS_PER_FRAME_GROUP))
+            endtime = time.time()
+            time_counter += endtime - starttime
             data = cursor.fetchall()
 
             fgcid = -1
@@ -106,6 +110,7 @@ def worker_thread(ids, begin, end, frame_duration, procedure, directory):
 
             _write_line_to_file(_fill_line(line), filename)
             begin += 1
+        print('HANA time: {}, {}'.format(time_counter, directory))
 
 
 def _fill_line(line):
