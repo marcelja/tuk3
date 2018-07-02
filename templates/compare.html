@@ -74,7 +74,7 @@
         </div>
         <div class="row">
             <div class="col-4">
-                <h4>Profit</h4>
+                <h4>Profit Single</h4>
                 <div class="form-inline">
                     <div class="input-group input-group-sm mr-1">
                         <input id="input-profit" class="form-control" type="number" placeholder="Trajectory ID">
@@ -85,6 +85,15 @@
                 </div>
                 <div class="chart-container">
                     <canvas id="chart-profit"></canvas>
+                </div>
+            </div>
+            <div class="col-4">
+                <h4>Profit All</h4>
+                <div class="form-inline">
+                    <button class="btn btn-sm btn-secondary" onclick="showProfitAll()">Start</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-profitAll"></canvas>
                 </div>
             </div>
         </div>

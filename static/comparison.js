@@ -17,6 +17,9 @@ function initCharts() {
     },
     profit: {
       labels: ['Points', 'Points sorted']
+    },
+    profitAll: {
+      labels: ['Points', 'Points sorted', 'ST precalculated']
     }
   };
   for (chartName in chartDetails) {
@@ -136,4 +139,20 @@ async function showProfit() {
 function loadProfit(trajectoryId) {
   return loadData(['/profit/' + trajectoryId,
                   '/profit_sorted/' + trajectoryId]);
+}
+
+async function showProfitAll() {  
+  let data = await loadProfitAll();
+  showChart('profitAll', data);
+}
+
+function loadProfitAll(trajectoryId) {
+  let data = {
+    sql: [575],
+    python: [0]
+  };
+  // let liveData = loadData(['/profit_all/', '/profit_all_sorted/']);
+  // data.sql.concat(liveData.sql);
+  // data.python.concat(liveData.python);
+  return data;
 }
