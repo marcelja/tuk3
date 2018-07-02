@@ -17,6 +17,9 @@ function initCharts() {
     },
     profit: {
       labels: ['Points', 'Points sorted']
+    },
+    profitAll: {
+      labels: ['Points', 'Points sorted', 'ST precalculated']
     }
   };
   for (chartName in chartDetails) {
@@ -71,26 +74,16 @@ function showChart(chartName, data) {
   charts[chartName].update();
 }
 
-async function loadData(pointUrl, frameUrl, keyValueUrl) {
+async function loadData(urls) {
   let results = {
     sql: [],
     python: []
   };
-  await $.getJSON(pointUrl)
-    .then((data) => {
-      results.sql[0] = data.performance.sql;
-      results.python[0] = data.performance.python;
-    });
-  await $.getJSON(frameUrl)
-    .then((data) => {
-      results.sql[1] = data.performance.sql;
-      results.python[1] = data.performance.python;
-    });
-  if (keyValueUrl) {
-    await $.getJSON(keyValueUrl)
+  for (let i in urls) {
+    await $.getJSON(urls[i])
       .then((data) => {
-        results.sql[2] = data.performance.sql;
-        results.python[2] = data.performance.python;
+        results.sql[i] = data.performance.sql;
+        results.python[i] = data.performance.python;
       });
   }
   return results;
@@ -103,9 +96,9 @@ async function showTraWhole() {
 }
 
 function loadTraWhole(trajectoryId) {
-  return loadData('/trajectory_point/' + trajectoryId,
+  return loadData(['/trajectory_point/' + trajectoryId,
   '/trajectory_frame/' + trajectoryId,
-  '/trajectory_keyvalue/' + trajectoryId);
+  '/trajectory_keyvalue/' + trajectoryId]);
 }
 
 async function showFramegroup() {
@@ -117,8 +110,8 @@ async function showFramegroup() {
 }
 
 function loadFramegroup(framegroup, granularity) {
-  return loadData('/timeframe_granularity_points/' + framegroup + '/' + granularity,
-                  '/timeframe_granularity/' + framegroup + '/0/' + granularity);
+  return loadData(['/timeframe_granularity_points/' + framegroup + '/' + granularity,
+                  '/timeframe_granularity/' + framegroup + '/0/' + granularity]);
 }
 
 async function showChangepoints() {
@@ -131,9 +124,9 @@ async function showChangepoints() {
 }
 
 function loadChangepoints(framegroup, granularity, mode) {
-  return loadData('/changepoints_points/' + mode + '/' + framegroup + '/' + granularity,
+  return loadData(['/changepoints_points/' + mode + '/' + framegroup + '/' + granularity,
                   '/changepoints_points_sorted/' + mode + '/' + framegroup + '/' + granularity,
-                  '/changepoints/' + mode + '/' + framegroup + '/' + granularity);
+                  '/changepoints/' + mode + '/' + framegroup + '/' + granularity]);
 }
 
 async function showProfit() {
@@ -144,6 +137,22 @@ async function showProfit() {
 }
 
 function loadProfit(trajectoryId) {
-  return loadData('/profit/' + trajectoryId,
-                  '/profit_sorted/' + trajectoryId);
+  return loadData(['/profit/' + trajectoryId,
+                  '/profit_sorted/' + trajectoryId]);
+}
+
+async function showProfitAll() {  
+  let data = await loadProfitAll();
+  showChart('profitAll', data);
+}
+
+function loadProfitAll(trajectoryId) {
+  let data = {
+    sql: [575],
+    python: [0]
+  };
+  // let liveData = loadData(['/profit_all/', '/profit_all_sorted/']);
+  // data.sql.concat(liveData.sql);
+  // data.python.concat(liveData.python);
+  return data;
 }
