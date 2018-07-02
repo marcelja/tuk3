@@ -148,13 +148,14 @@ async function showProfitAll() {
   showChart('profitAll', data);
 }
 
-function loadProfitAll(trajectoryId) {
+async function loadProfitAll(trajectoryId) {
   let data = {
-    sql: [575, 101],
+    sql: [575031.241, 101102.274],
     python: [0, 0]
   };
-  // let liveData = loadData(['/profit_all/', '/profit_all_sorted/']);
-  // data.sql.concat(liveData.sql);
-  // data.python.concat(liveData.python);
+  let liveData = await loadData(['/profit_manual']);
+  console.log(liveData);
+  data.sql = data.sql.concat(liveData.sql);
+  data.python = data.python.concat(liveData.python);
   return data;
 }
