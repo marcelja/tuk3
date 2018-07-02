@@ -16,10 +16,10 @@ function initCharts() {
       labels: ['Points', 'Points sorted', 'Frame']
     },
     profit: {
-      labels: ['Points', 'Points sorted']
+      labels: ['Points', 'Points sorted', 'ST precalculated', ['Points', 'manual distance']]
     },
     profitAll: {
-      labels: ['Points', 'Points sorted', 'ST precalculated']
+      labels: ['Points sorted', 'ST precalculated', ['Points', 'manual distance']]
     }
   };
   for (chartName in chartDetails) {
@@ -138,7 +138,9 @@ async function showProfit() {
 
 function loadProfit(trajectoryId) {
   return loadData(['/profit/' + trajectoryId,
-                  '/profit_sorted/' + trajectoryId]);
+                  '/profit_sorted/' + trajectoryId,
+                  '/profit_precalculated_st/' + trajectoryId,
+                  'profit_manual/' + trajectoryId]);
 }
 
 async function showProfitAll() {  
@@ -146,13 +148,14 @@ async function showProfitAll() {
   showChart('profitAll', data);
 }
 
-function loadProfitAll(trajectoryId) {
+async function loadProfitAll(trajectoryId) {
   let data = {
-    sql: [575],
-    python: [0]
+    sql: [575031.241, 101102.274],
+    python: [0, 0]
   };
-  // let liveData = loadData(['/profit_all/', '/profit_all_sorted/']);
-  // data.sql.concat(liveData.sql);
-  // data.python.concat(liveData.python);
+  let liveData = await loadData(['/profit_manual']);
+  console.log(liveData);
+  data.sql = data.sql.concat(liveData.sql);
+  data.python = data.python.concat(liveData.python);
   return data;
 }
