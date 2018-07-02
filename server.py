@@ -117,19 +117,81 @@ def timeframe(fgcid, frame):
         return Response(json.dumps(cursor.fetchall(), separators=(',', ':')), mimetype='application/json')
 
 
-@app.route('/timeframe_granularity/<int:fgcid>/<int:frame>/<int:granularity>')
-def timeframe_granularity(fgcid, frame, granularity):
+@app.route('/timeframe_granularity/<int:fgcid>/<int:granularity>')
+def timeframe_granularity(fgcid, granularity):
     # Granularity is supposed to be >= 0 and < 7
     with Cursor(SCHEMA_NAME) as cursor:
-        lat = 'PF{}PX'.format(frame)
-        lon = 'PF{}PY'.format(frame)
+        
+        query =  '''select lat, lon, count(*) as weight from (
+                        select round(frame_format_15.ify + frame_format_15.pf0py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf0px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf1py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf1px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf2py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf2px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf3py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf3px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf4py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf4px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf5py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf5px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf6py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf6px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf7py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf7px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf8py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf8px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf9py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf9px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf9py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf9px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf10py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf10px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf11py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf11px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf12py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf12px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf13py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf13px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf14py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf14px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf15py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf15px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf16py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf16px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf17py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf17px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf18py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf18px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf19py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf19px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf20py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf20px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf21py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf21px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf22py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf22px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf23py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf23px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf24py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf24px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf25py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf25px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf26py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf26px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf27py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf27px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf28py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf28px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf29py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf29px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf30py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf30px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf31py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf31px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf32py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf32px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf33py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf33px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf34py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf34px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf35py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf35px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf36py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf36px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf37py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf37px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf38py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf38px, {1}) as lon from frame_format_15 where fgcid = {0}
+                        union all select round(frame_format_15.ify + frame_format_15.pf39py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf39px, {1}) as lon from frame_format_15 where fgcid = {0}
+                    )
+                    group by lat, lon;
+                '''.format(fgcid, granularity)
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
+@app.route('/timeframe_granularity_heatmap/<int:fgcid>/<int:granularity>')
+def timeframe_granularity_heatmap(fgcid, granularity):
+    # Granularity is supposed to be >= 0 and < 7
+    with Cursor(SCHEMA_NAME) as cursor:
         query = '''select lat, lon, count(*) as weight from (
-                            select round({0} + ify, {1}) as lat,
-                                   round({2} + ifx, {1}) as lon
-                            from "TUK3_TS_MJ"."FRAME_FORMAT_15"
-                            where fgcid = {3}
-                            and {0} is not NULL)
-                        group by lat, lon'''.format(lat, granularity, lon, fgcid)
+                            select round(pf0py + ify, {1}) as lat,
+                                   round(pf0px + ifx, {1}) as lon
+                            from frame_format_15
+                            where fgcid = {0}
+                            and pf0py is not NULL)
+                        group by lat, lon'''.format(fgcid, granularity)
 
         cursor.execute(query)
         result = cursor.fetchall()
