@@ -106,7 +106,7 @@ function loadHeatmap(mapType, time, granularity) {
   let url = (function (mapType) {
     switch (mapType) {
       case 'all':
-        return '/timeframe_granularity/' + time + '/0/' + granularity
+        return '/timeframe_granularity_heatmap/' + time + '/' + granularity
         break;
       case 'pickup':
         return '/changepoints/pickup/' + time + '/' + granularity
