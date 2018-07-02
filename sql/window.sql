@@ -39,8 +39,6 @@ LANGUAGE SQLSCRIPT AS
  and (lat1 < to_int(:max_lat) or (lat1 = to_int(:max_lat) and lat2 <= to_int(mod(:max_lat, 1) * 10000)))
  and (lon1 > to_int(:min_lon) or (lon1 = to_int(:min_lon) and lon2 >= to_int(mod(:min_lon, 1) * 10000)))
  and (lon1 < to_int(:max_lon) or (lon1 = to_int(:max_lon) and lon2 <= to_int(mod(:max_lon, 1) * 10000)))
- and (lon1 > to_int(:min_lon) or (lon1 = to_int(:min_lon) and lon2 >= to_int(mod(:min_lon, 1) * 10000)))
- and (lon1 < to_int(:max_lon) or (lon1 = to_int(:max_lon) and lon2 <= to_int(mod(:max_lon, 1) * 10000)))
  and (to_int(:end_time / 3600) > timehour
  or (to_int(:end_time / 3600) = timehour and mod(to_int(:end_time / 60), 60) > timeminute)
  or (to_int(:end_time / 3600) = timehour and mod(to_int(:end_time / 60), 60) = timeminute and mod(:end_time , 60) >= timesecond))
