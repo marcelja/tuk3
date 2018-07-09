@@ -19,7 +19,7 @@ function initCharts() {
       labels: ['Points', 'Points sorted', 'ST precalculated', ['Points', 'manual distance']]
     },
     profitAll: {
-      labels: ['Points sorted', 'ST precalculated', ['Points', 'manual distance']]
+      labels: ['Frame', 'Points sorted', ['ST', 'precalculated'], ['Points', 'manual', ' distance']]
     }
   };
   for (chartName in chartDetails) {
@@ -150,8 +150,9 @@ async function showProfitAll() {
 
 async function loadProfitAll(trajectoryId) {
   let data = {
-    sql: [575031.241, 101102.274],
-    python: [0, 0]
+    // frame: 129509 avg * 10594 trajectories
+    sql: [1372018346, 575031.241, 101102.274],
+    python: [0, 0, 0]
   };
   let liveData = await loadData(['/profit_manual']);
   console.log(liveData);
