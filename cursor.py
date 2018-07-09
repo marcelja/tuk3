@@ -6,8 +6,8 @@ import os
 
 class Cursor(object):
     def __init__(self, schema):
-        hana_user = "SYSTEM"
-        hana_pwd = "manager"
+        hana_user = os.environ.get('HANA_USER')
+        hana_pwd = os.environ.get('HANA_PWD')
         if not hana_pwd and not hana_user:
             raise EnvironmentError('Please provide user and password as environment variables (HANA_USER, HANA_PWD)!')
         try:
