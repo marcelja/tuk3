@@ -126,6 +126,10 @@ function loadHeatmap(mapType, time, granularity) {
   });
 }
 
+function toggleHeatmap() {
+  heatmap.setMap(heatmap.getMap() ? null : map);
+}
+
 function showHeatmap() {
   let value = $('#heatmap-select').val();
   if (value === 'none') {
