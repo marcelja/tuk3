@@ -4,6 +4,7 @@
 
 var map, heatmap, paths = [], markers = [];
 var play = false;
+var infowindow;
 
 var gradient = [
   'rgba(0, 255, 255, 0)',
@@ -192,7 +193,9 @@ function addInformation(position, startTime, endTime, distance) {
   var km = Math.round(2.4*distance/1000);
   var waiting = Math.round(diff * 0.1 / 60 * 48);
 
-  var infowindow = new google.maps.InfoWindow({
+  if (infowindow != undefined) infowindow.close();
+
+  infowindow = new google.maps.InfoWindow({
     content: `start: ${startTime}, 
     end: ${endTime}<br>distance: ${Math.round(distance/100)/10} km<br>
     est. price: 11.00¥ + ${km}¥ (km) + ${waiting}¥ (waiting) 
