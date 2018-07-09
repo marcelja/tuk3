@@ -30,12 +30,12 @@ def trajectory_point(tid):
                    order by timestamp'''.format(tid)
         cursor.execute(query)
         response = {
+            "result": cursor.fetchall(),
             "performance": {
                 "query": query,
                 "sql": get_sql_execution_time(query),
                 "python": 0
-            },
-            "result": cursor.fetchall()
+            }
         }
         return Response(json.dumps(response,
                                 default=_convert_timestamp,
@@ -45,25 +45,27 @@ def trajectory_point(tid):
 @app.route('/trajectory_keyvalue/<int:tid>')
 def trajectory_keyvalue(tid):
     # Must be in range 22223 <= TID <= 36950
+    query = '''select obj from "TUK3_TS_MJ"."KEY_VALUE"
+               where id = {}'''.format(tid)
+
     with Cursor(SCHEMA_NAME) as cursor:
-        query = '''select obj from "TUK3_TS_MJ"."KEY_VALUE"
-                   where id = {}'''.format(tid)
         cursor.execute(query)
         result_tuple = cursor.fetchone()
         # tuple contains only one selected value
         start = time.clock()
         trajectory_object = result_tuple[0].read()
         end = time.clock()
-        response = {
-            "performance": {
-                "query": query,
-                "sql": get_sql_execution_time(query),
-                "python": calc_execution_time(start, end)
-            },
-            "result": json.loads(trajectory_object)
-        }
-        return Response(json.dumps(response, separators=(',', ':')),
-                        mimetype='application/json')
+
+    response = {
+        "performance": {
+            "query": query,
+            "sql": get_sql_execution_time(query),
+            "python": calc_execution_time(start, end)
+        },
+        "result": json.loads(trajectory_object)
+    }
+    return Response(json.dumps(response, separators=(',', ':')),
+                    mimetype='application/json')
 
 @app.route('/trajectory_frame/<int:tid>')
 def trajectory_frame(tid):
