@@ -614,6 +614,44 @@ def profit_id_manual(id):
         }
         return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/window/<float:latMin>/<float:lonMin>/<float:latMax>/<float:lonMax>/<int:start>/<int:end>')
+def window(latMin, lonMin, latMax, lonMax, start, end):
+    with Cursor(SCHEMA_NAME) as cursor:
+        result = []
+
+        query = 'call taxis_in_window({0}, {1}, {2}, {3}, {4}, {5}, ?);'.format(latMin, lonMin, latMax, lonMax, start, end)
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
+@app.route('/window_int/<float:latMin>/<float:lonMin>/<float:latMax>/<float:lonMax>/<int:start>/<int:end>')
+def window_int(latMin, lonMin, latMax, lonMax, start, end):
+    with Cursor(SCHEMA_NAME) as cursor:
+        result = []
+
+        query = 'call taxis_in_window_ints({0}, {1}, {2}, {3}, {4}, {5}, ?);'.format(latMin, lonMin, latMax, lonMax, start, end)
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 def _convert_timestamp(ts):
     if isinstance(ts, datetime.datetime):
         return str(ts)

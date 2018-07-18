@@ -96,6 +96,25 @@
                     <canvas id="chart-profitAll"></canvas>
                 </div>
             </div>
+            <div class="col-4">
+                <h4>Space and Time Window</h4>
+                <div class="form-inline">
+                    <div class="input-group input-group-sm mr-1">
+                        <input id="input-window-lat-min" class="form-control" type="number" placeholder="Lat Min" value="22.5290012">
+                        <input id="input-window-lon-min" class="form-control" type="number" placeholder="Lon Min" value="114.047024">
+                        <input id="input-window-lat-max" class="form-control" type="number" placeholder="Lat Max" value="22.548516">
+                        <input id="input-window-lon-max" class="form-control" type="number" placeholder="Lon Max" value="114.0570565">
+                        <input id="input-window-start" class="form-control" type="number" placeholder="Start Time s" value="3600">
+                        <input id="input-window-end" class="form-control" type="number" placeholder="End Time s" value="10800">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" onclick="showWindow()">Start</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-window"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -19,7 +19,10 @@ function initCharts() {
       labels: ['Points', 'Points sorted', 'ST precalculated', ['Points', 'manual distance']]
     },
     profitAll: {
-      labels: ['Frame', 'Points sorted', ['ST', 'precalculated'], ['Points', 'manual', ' distance']]
+      labels: ['Points sorted', ['ST', 'precalculated'], ['Points', 'manual', ' distance']]
+    },
+    window: {
+      labels: ['Points', 'Points INT']
     }
   };
   for (chartName in chartDetails) {
@@ -148,10 +151,10 @@ async function showProfitAll() {
   showChart('profitAll', data);
 }
 
-async function loadProfitAll(trajectoryId) {
+async function loadProfitAll() {
   let data = {
     // frame: 129509 avg * 10594 trajectories
-    sql: [1372018346, 575031.241, 101102.274],
+    sql: [575031.241, 101102.274],
     python: [0, 0, 0]
   };
   let liveData = await loadData(['/profit_manual']);
@@ -159,4 +162,20 @@ async function loadProfitAll(trajectoryId) {
   data.sql = data.sql.concat(liveData.sql);
   data.python = data.python.concat(liveData.python);
   return data;
+
+}
+async function showWindow() {
+  let latMin = parseFloat($('#input-window-lat-min').val());
+  let lonMin = parseFloat($('#input-window-lon-min').val());
+  let latMax = parseFloat($('#input-window-lat-max').val());
+  let lonMax = parseFloat($('#input-window-lon-max').val());
+  let start = parseInt($('#input-window-start').val());
+  let end = parseInt($('#input-window-end').val());
+  let data = await loadWindow(latMin, lonMin, latMax, lonMax, start, end);
+  showChart('window', data);
+}
+
+async function loadWindow(latMin, lonMin, latMax, lonMax, start, end) {
+  return loadData([`/window/${latMin}/${lonMin}/${latMax}/${lonMax}/${start}/${end}`,
+                    `/window_int/${latMin}/${lonMin}/${latMax}/${lonMax}/${start}/${end}`]);
 }
