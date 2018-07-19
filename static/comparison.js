@@ -23,6 +23,9 @@ function initCharts() {
     },
     window: {
       labels: ['Points', 'Points INT']
+    },
+    insert: {
+      labels: ['Points', ['ST', 'precalculated'], ['Points', 'manual', ' distance'], 'Frame', 'Key-Value']
     }
   };
   for (chartName in chartDetails) {
@@ -164,6 +167,7 @@ async function loadProfitAll() {
   return data;
 
 }
+
 async function showWindow() {
   let latMin = parseFloat($('#input-window-lat-min').val());
   let lonMin = parseFloat($('#input-window-lon-min').val());
@@ -178,4 +182,17 @@ async function showWindow() {
 async function loadWindow(latMin, lonMin, latMax, lonMax, start, end) {
   return loadData([`/window/${latMin}/${lonMin}/${latMax}/${lonMax}/${start}/${end}`,
                     `/window_int/${latMin}/${lonMin}/${latMax}/${lonMax}/${start}/${end}`]);
+}
+
+async function showInsert() {
+  let data = await loadInsert();
+  showChart('insert', data);
+}
+
+async function loadInsert() {
+  return loadData(['/insert/shenzhen_clean/99999/114.0287448/22.5315682/1/50/33300/true',
+                    '/insert/shenzhen_clean/99999/114.0287448/22.5315682/1/50/33300/true',
+                    '/insert/shenzhen_clean/99999/114.0287448/22.5315682/1/50/33300/true',
+                    '/insert/shenzhen_clean/99999/114.0287448/22.5315682/1/50/33300/true',
+                    '/insert/shenzhen_clean/99999/114.0287448/22.5315682/1/50/33300/true']);
 }

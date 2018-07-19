@@ -652,6 +652,37 @@ def window_int(latMin, lonMin, latMax, lonMax, start, end):
         }
         return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/insert/<table>/<int:tid>/<float:lat>/<float:lon>/<int:occupancy>/<int:speed>/<int:seconds>/<delete>')
+def insert(table, tid, lat, lon, occupancy, speed, seconds, delete):
+    with Cursor(SCHEMA_NAME) as cursor:
+        date = datetime.datetime(1900,1,1) + datetime.timedelta(seconds=seconds)
+        timestamp = "01.01.0001 " + date.strftime("%H:%M:%S")
+        result = []
+
+        query = ''
+        delete_query = ''
+
+        if (table == 'shenzhen_clean'):
+            query = '''insert into 
+                        shenzhen_clean(id, lat, lon, occupancy, speed, seconds, timestamp) 
+                        values({0}, {1}, {2}, {3}, {4}, {5}, '{6}');'''.format(tid, lat, lon, occupancy, speed, seconds, timestamp)
+            delete_query = '''delete from shenzhen_clean where id = {0} and seconds = {1};'''.format(tid, seconds)
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+        if (delete == "true"):
+            cursor.execute(delete_query)
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query.replace("'", "''")),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 def _convert_timestamp(ts):
     if isinstance(ts, datetime.datetime):
         return str(ts)
