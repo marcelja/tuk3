@@ -238,6 +238,60 @@ def timeframe_granularity_points(fgcid, granularity):
         }
         return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
 
+@app.route('/single_timeframe_frames/<int:frame_id>/<int:granularity>')
+def single_timeframe_frames(frame_id, granularity):
+    fgcid = int(frame_id / 40)
+    frame_column = frame_id % 40
+
+    with Cursor(SCHEMA_NAME) as cursor:
+        query =  '''select lat, lon, count(*) as weight from (
+                        select round(frame_format_15.ify + frame_format_15.pf{0}py, {1}) as lat, round(frame_format_15.ifx + frame_format_15.pf{0}px, {1}) as lon from frame_format_15 where fgcid = {2}
+                    )
+                    group by lat, lon order by weight desc;
+                '''.format(frame_column, granularity, fgcid)
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
+
+@app.route('/single_timeframe_points/<int:frame_id>/<int:granularity>')
+def single_timeframe_points(frame_id, granularity):
+    with Cursor(SCHEMA_NAME) as cursor:
+        seconds = frame_id * 15
+        query =  '''SELECT lat, lon, count(*) as weight from (
+                    SELECT 
+                        round(lat, {2}) as lat, 
+                        round(lon, {2}) as lon 
+                    FROM shenzhen_clean 
+                    WHERE 
+                        seconds >= {0} 
+                        AND seconds < {1} 
+                        AND lat IS NOT NULL
+                ) GROUP BY lat, lon order by weight desc'''.format(seconds, seconds + 15, granularity)
+
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        response = {
+            "performance": {
+                "query": query,
+                "sql": get_sql_execution_time(query),
+                "python": 0
+            },
+            "result": result
+        }
+        return Response(json.dumps(response, separators=(',', ':')), mimetype='application/json')
+
 @app.route('/route/<int:tid>')
 def route_information(tid):
     with Cursor(SCHEMA_NAME) as cursor:

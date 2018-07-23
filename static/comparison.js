@@ -12,6 +12,9 @@ function initCharts() {
     framegroup: {
       labels: ['Points', 'Frame']
     },
+    singleframe: {
+      labels: ['Points', 'Frame']
+    },
     changepoints: {
       labels: ['Points', 'Points sorted', 'Frame']
     },
@@ -119,6 +122,19 @@ async function showFramegroup() {
 function loadFramegroup(framegroup, granularity) {
   return loadData(['/timeframe_granularity_points/' + framegroup + '/' + granularity,
                   '/timeframe_granularity/' + framegroup + '/' + granularity]);
+}
+
+async function showSingleFrame() {
+  let frameid = parseInt($('#input-frameid').val());
+  let granularity = parseInt($('#input-granularity2').val());
+  
+  let data = await loadSingleFrame(frameid, granularity);
+  showChart('singleframe', data);
+}
+
+function loadSingleFrame(frameid, granularity) {
+  return loadData(['/single_timeframe_points/' + frameid + '/' + granularity,
+                  '/single_timeframe_frames/' + frameid + '/' + granularity]);
 }
 
 async function showChangepoints() {
