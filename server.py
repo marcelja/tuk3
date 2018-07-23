@@ -24,10 +24,10 @@ def compare():
 def trajectory_point(tid):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
-        query = '''select lat, lon, timestamp
+        query = '''select lat, lon, seconds
                    from shenzhen_clean
                    where id = {}
-                   order by timestamp'''.format(tid)
+                   order by seconds'''.format(tid)
         cursor.execute(query)
         response = {
             "result": cursor.fetchall(),
@@ -67,17 +67,17 @@ def trajectory_keyvalue(tid):
     return Response(json.dumps(response, separators=(',', ':')),
                     mimetype='application/json')
 
-@app.route('/trajectory_frame/<int:tid>')
-def trajectory_frame(tid):
+@app.route('/trajectory_frame/<int:tid>/<int:framelength>')
+def trajectory_frame(tid, framelength):
     # Must be in range 22223 <= TID <= 36950
     with Cursor(SCHEMA_NAME) as cursor:
         # Layout: tid, fgcid, ifx, ify, pf0px, pf0py, ...
         query = 'select tid, fgcid, ifx, ify'
         for i in range(40):
             query += ', pf{0}px, pf{0}py'.format(i)
-        query += ''' from "TUK3_TS_MJ"."FRAME_FORMAT_15"
+        query += ''' from "TUK3_TS_MJ"."FRAME_FORMAT_{}"
                    where tid = {}
-                   order by fgcid'''.format(tid)
+                   order by fgcid'''.format(framelength, tid)
         cursor.execute(query)
         query_result = cursor.fetchall()
         result = []

@@ -7,7 +7,7 @@ window.onload = function () {
 function initCharts() {
   let chartDetails = {
     traWhole: {
-      labels: ['Points', 'Frame', 'Key-Value']
+      labels: ['Points', 'Frame 15s', 'Frame 30s', 'Key-Value']
     },
     framegroup: {
       labels: ['Points', 'Frame']
@@ -103,7 +103,8 @@ async function showTraWhole() {
 
 function loadTraWhole(trajectoryId) {
   return loadData(['/trajectory_point/' + trajectoryId,
-  '/trajectory_frame/' + trajectoryId,
+  '/trajectory_frame/' + trajectoryId + '/15',
+  '/trajectory_frame/' + trajectoryId + '/30',
   '/trajectory_keyvalue/' + trajectoryId]);
 }
 
