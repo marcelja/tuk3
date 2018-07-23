@@ -656,7 +656,7 @@ def window_int(latMin, lonMin, latMax, lonMax, start, end):
 def insert(table, tid, lat, lon, occupancy, speed, seconds, delete):
     with Cursor(SCHEMA_NAME) as cursor:
         date = datetime.datetime(1900,1,1) + datetime.timedelta(seconds=seconds)
-        timestamp = "01.01.0001 " + date.strftime("%H:%M:%S")
+        # timestamp = "01.01.0001 " + date.strftime("%H:%M:%S")
         result = []
 
         query = ''
@@ -664,8 +664,8 @@ def insert(table, tid, lat, lon, occupancy, speed, seconds, delete):
 
         if (table == 'shenzhen_clean'):
             query = '''insert into 
-                        shenzhen_clean(id, lat, lon, occupancy, speed, seconds, timestamp) 
-                        values({0}, {1}, {2}, {3}, {4}, {5}, '{6}');'''.format(tid, lat, lon, occupancy, speed, seconds, timestamp)
+                        shenzhen_clean(id, lat, lon, occupancy, speed, seconds) 
+                        values({0}, {1}, {2}, {3}, {4}, {5});'''.format(tid, lat, lon, occupancy, speed, seconds)
             delete_query = '''delete from shenzhen_clean where id = {0} and seconds = {1};'''.format(tid, seconds)
 
         cursor.execute(query)
