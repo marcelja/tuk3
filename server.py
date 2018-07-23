@@ -241,14 +241,14 @@ def timeframe_granularity_points(fgcid, granularity):
 @app.route('/route/<int:tid>')
 def route_information(tid):
     with Cursor(SCHEMA_NAME) as cursor:
-        query = '''select timestamp,lon,lat,occupancy
+        query = '''select seconds,lon,lat,occupancy
                         from shenzhen_clean
-                        where id='{}' order by timestamp
+                        where id='{}' order by seconds
                 '''.format(tid)
 
         cursor.execute(query)
         result = cursor.fetchall()
-        return Response(json.dumps([('{0.hour:02d}:{0.minute:02d}:{0.second:02d}'.format(x[0]),x[1],x[2],x[3]) for x in result], separators=(',', ':')), mimetype='application/json')
+        return Response(json.dumps([('{0.hour:02d}:{0.minute:02d}:{0.second:02d}'.format(datetime.datetime(2000,1,1,0,0,0) + datetime.timedelta(seconds=x[0])),x[1],x[2],x[3]) for x in result], separators=(',', ':')), mimetype='application/json')
 
 @app.route('/key_value/<int:hour>')
 def key_value(hour):
