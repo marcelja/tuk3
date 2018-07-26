@@ -1,2 +1,3 @@
-Flask==0.12.2
+geopy==1.14.0
+Flask==0.12
 pyhdb==0.3.4
