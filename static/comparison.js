@@ -50,6 +50,7 @@ function initCharts() {
         }]
       },
       options: {
+        devicePixelRatio: 5,
         scales: {
           yAxes: [{
             ticks: {
