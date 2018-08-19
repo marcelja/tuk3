@@ -3,6 +3,9 @@
 \def\@copyrightspace{\relax}
 \makeatother
 
+\usepackage{hyperref}
+
+
 \begin{document}
 
 % Copyright
@@ -34,11 +37,13 @@ The taxi business is an extremely competitive market. Private ridesharing compan
 \end{abstract}
 
 
-\keywords{Geospatial data, Trajectory analysis, Taxi data}
+\keywords{Geospatial data, Trajectory analysis, Taxi data, In-Memory}
 
 \section{Motivation}
 
 \section{Data Sources}
+
+The data we used is a freely available collection of GPS information of taxis. \footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12 AM and 23:59 PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. The total memory consumption without any further optimization (e.g. indices) of the Shenzhen data takes 541 MB.
 
 \subsection{Data Cleansing}
 
