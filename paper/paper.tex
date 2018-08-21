@@ -36,12 +36,14 @@
 The taxi business is an extremely competitive market. Private ridesharing companies such as Uber or Lynx have grown tremendously in the last decade. In order to survive as a traditional taxi company, the drivers have to increase their profit even further. Therefore, we created an application, that analysis taxi data recorded over one day in the city of Shenzhen. We examine which taxis were the most profitable ones by calculating the distances and times driven with a passenger. From this information, we can draw specific recommendations, where to take passengers at a certain time, so that the profit can be maximized.
 \end{abstract}
 
-
 \keywords{Geospatial data, Trajectory analysis, Taxi data, In-Memory}
 
 \section{Motivation}
 
+Traditional taxi companies like to increase their profit. For that, the individual taxi drivers would have to find many passengers and minimize their waiting times. A way to be a  good performing taxi is to stay in a profitable area of the city. For example, where taxi rides are highly needed at a specific time. With our help, the taxi companies can develop new strategies. A simple strategy would be to only accept and assign orders whose destination is in a good area for the expected arrival time. We created an interactive map, which shows the best performing taxis for one day in Shenzhen. This is based on a data set that is explained in section \ref{sec:ds}. The application has some additional information about the taxi density and numbers about pick-ups and drop-offs. Taxi companies could use the application to quickly analyze the collected GPS data.
+
 \section{Data Sources}
+\label{sec:ds}
 
 The data we used is a freely available collection of GPS information of taxis. \footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12 AM and 23:59 PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. The total memory consumption without any further optimization (e.g. indices) of the Shenzhen data takes 541 MB.
 
@@ -58,6 +60,8 @@ The data we used is a freely available collection of GPS information of taxis. \
 \section{Benchmark Results}
 
 \section{Future Work}
+
+% mehr daten hinzufuegen. kein problem, da alle queries optimiert wurden 
 
 \section{Conclusion}
 
