@@ -1,4 +1,4 @@
-\documentclass{sig-alternate}
+\documentclass[10pt]{sig-alternate}
 \makeatletter
 \def\@copyrightspace{\relax}
 \makeatother
@@ -40,12 +40,12 @@ The taxi business is an extremely competitive market. Private ridesharing compan
 
 \section{Motivation}
 
-Traditional taxi companies like to increase their profit. For that, the individual taxi drivers would have to find many passengers and minimize their waiting times. A way to be a  good performing taxi is to stay in a profitable area of the city. For example, where taxi rides are highly needed at a specific time. With our help, the taxi companies can develop new strategies. A simple strategy would be to only accept and assign orders whose destination is in a good area for the expected arrival time. We created an interactive map, which shows the best performing taxis for one day in Shenzhen. This is based on a data set that is explained in section \ref{sec:ds}. The application has some additional information about the taxi density and numbers about pick-ups and drop-offs. Taxi companies could use the application to quickly analyze the collected GPS data.
+Traditional taxi companies like to increase their profit. For that, the individual taxi drivers would have to find many passengers and minimize their waiting times. A way to be a  good performing taxi is to stay in a profitable area of the city. For example, where taxi rides are highly needed at a specific time. With our help, the taxi companies can develop new strategies. A simple strategy would be to only accept and assign orders whose destination is in a good area for the expected arrival time. We created an interactive map, which shows the best performing taxis for one day in Shenzhen. This is based on a data set that is explained in section \ref{sec:ds}. The application has some additional information about the taxi density and numbers about pick-ups and drop-offs. Taxi companies could use the application to quickly analyze the collected GPS data.\\
 
 \section{Data Sources}
 \label{sec:ds}
 
-The data we used is a freely available collection of GPS information of taxis.\footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12 AM and 23:59 PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. The total memory consumption without any further optimization (e.g. indices) of the Shenzhen data takes 541 MB.
+The data we used is a freely available collection of GPS information of taxis.\footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/\\UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12 AM and 23:59 PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. The total memory consumption without any further optimization (e.g. indices) of the Shenzhen data takes 541 MB.
 
 \subsection{Data Cleansing}
 Before we started analyzing the trajectories we had a closer look at the dataset itself. We noticed rather soon, that there are some inconsistencies within data. Hence, we perform data cleansing. In the following paragraphs, we describe our criteria for data cleansing in detail.
@@ -83,7 +83,7 @@ Figure \ref{fig:single_ride} illustrates how the taxi routes are drawn. The line
 \label{fig:single_ride}
 \end{figure}
 
-Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID 36290 in figure \ref{fig:ranking}). You can see that this taxi had the most tours in one area. The taxi had 83 tours during the day. These tours sum up to a distance of 482 kilometers. The red lines are often very short.
+Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID \textit{36290} in figure \ref{fig:ranking}). You can see that this taxi had the most tours in one area. The taxi had 83 tours during the day. These tours sum up to a distance of 482 kilometers. The red lines are often very short.
 
 \begin{figure}[ht]
 \centering
@@ -93,7 +93,9 @@ Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID 36290
 \end{figure}
 
 \subsection{Heatmaps}
-\label{sec:heatmaps} 
+\label{sec:heatmaps}
+
+The application has a taxi density heatmap (see figure \ref{fig:density}). The areas, which have many taxis at the given time, are colored red. Areas with less taxis are colored blue. The user interface has a time slider. When changing the time from \textit{15:00} to another time, the map would refresh. In the top left corner is a play button. With the play function, the map continually updates to the next time interval. Thus, the user can observe how the taxi density changes over time.
 
 \begin{figure}[ht]
 \centering
@@ -101,6 +103,8 @@ Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID 36290
 \caption{Taxi density heatmap}
 \label{fig:density}
 \end{figure}
+
+The heatmap can visualize two different things. One of these is the number of picked up passengers. The other one is the number of dropped passengers. Figure \ref{fig:pickup} shows a screenshot with the pickup points heatmap. The user interface has a dropdown menu to let the user select which heatmap is displayed.
 
 \begin{figure}[ht]
 \centering
