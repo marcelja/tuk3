@@ -51,6 +51,32 @@ The data we used is a freely available collection of GPS information of taxis. \
 
 \section{Application Prototype}
 
+The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The profit can be estimated pretty accurately with the help of the distances and the tours' start and end times. We mention distance and profit calculations in section \ref{todo}. The list is sorted by the estimated profit. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
+
+\begin{figure}[h]
+\label{fig:ranking}
+\centering
+\includegraphics[width=0.5\textwidth]{img/ranking.png}
+\caption{Ranking of the most profitable taxis}
+\end{figure}
+
+
+Figure \ref{fig:single_ride} illustrates how the taxi routes are drawn. The line is red if the taxi was driven without a passenger. The line is green if it had a passenger. Arrows indicate the direction. At the end of a tour is always a Yuan symbol on which the user can click. The click lets pop up information about the tour (i.e. start time, end time, distance and the estimated profit).\\
+
+\begin{figure}[h]
+\label{fig:single_ride}
+\centering
+\includegraphics[width=0.5\textwidth]{img/single_ride.png}
+\caption{Information about one ride}
+\end{figure}
+
+\begin{figure}[h]
+\label{fig:best_taxi}
+\centering
+\includegraphics[width=0.5\textwidth]{img/best_taxi.png}
+\caption{Entire taxi route}
+\end{figure}
+
 \subsection{System Architecture}
 
 \subsection{Data Layouts}
