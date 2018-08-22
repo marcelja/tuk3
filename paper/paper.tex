@@ -4,7 +4,7 @@
 \makeatother
 
 \usepackage{hyperref}
-
+\newcommand{\quotes}[1]{``{#1}''}
 
 \begin{document}
 
@@ -31,6 +31,7 @@
   Dr. Matthias Uflacker, Keven Richly
 }
 
+
 \maketitle
 \begin{abstract}
 The taxi business is an extremely competitive market. Private ridesharing companies such as Uber or Lynx have grown tremendously in the last decade. In order to survive as a traditional taxi company, the drivers have to increase their profit even further. Therefore, we created an application, that analysis taxi data recorded over one day in the city of Shenzhen. We examine which taxis were the most profitable ones by calculating the distances and times driven with a passenger. From this information, we can draw specific recommendations, where to take passengers at a certain time, so that the profit can be maximized.
@@ -54,17 +55,19 @@ Before we started analyzing the trajectories we had a closer look at the dataset
 The data was already imported into the database by our supervisor, when we started our project. Since, we did not want to change the the original data we created an own table. Once we wanted to create a primary key, the database has thrown an error stating that the data has duplicate values. In fact, there are 381 data points occuring not only twice, but also multiple times. We deleted those entries, because they do not add any value to the data and prevent the creation of a primary key.
 
 \subsubsection{Bounding box}
-Generally, GPS coordinates are not completely accurate. However, there are points in the data set, that do not make sense, are not even possible or do not fit into the geospatial system of longitudes and latidues. The graphic \ref{fig:bbox} below shows the trajectory with id $22,360$ which passes through the ocean. In order to eliminate such outliers, we use a bounding box (rectangle highlighted in red color). To avoid deleting points that are outside this area, because there a taxi really drove there, we have chosen the rectangle intentionally large. This data cleansing step effects almost 8,000 GPS points.
+Generally, GPS coordinates are not completely accurate. However, there are points in the data set, that do not make sense, are not even possible or do not fit into the geospatial system of longitudes and latidues. The graphic \ref{fig:bbox} below shows the trajectory with id \textit{22,360} which passes through the ocean. In order to eliminate such outliers, we use a bounding box (rectangle highlighted in red color). To avoid deleting points that are outside this area, because there a taxi really drove there, we have chosen the rectangle intentionally large. This data cleansing step effects almost 8,000 GPS points.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{img/bounding_box.png}
-\caption{Bounding box and trajectory $22,360$ passing through the ocean}
+\caption{Bounding box and trajectory \textit{22,360} passing through the ocean}
 \label{fig:bbox}
 \end{figure}
 
 
 \subsubsection{Small trajectories}
+Some trajectories have only a few data points. The reasons for that can be of different nature. Some trajectories include only a few minutes instead of a whole day. Others have breaks lasting a couple of hours. We also noticed, that some taxis have a different time interval in terms of sending GPS locations, for example only every five minutes. In all of those cases, we delete the whole trajectory. We applied this to each taxi route having less than 500 entries.
+
 \subsubsection{Wrong passenger status}
 The status flag indicating the presence of a passenger seems to be wrong in different trajectories. We found three different scenarios and removed the whole trajetory if at least one is fulfilled. First, there are trips passing through the whole city without any passengers at all. Second, the opposite is the case: Taxis do have the same passenger for almost a day. We filtered those trajectories out by adding rules. We assume, that a taxi is supposed to have a passenger for at least two hours (not necessarily continously) and no passenger for at least one hour (also not continously) within the recorded day. In the third case, the passenger status keeps switching over time as depicted in graphic \ref{fig:passenger_status}. In order to avoid wrong calculations based on the false data, we deleted the whole trajectories.
 
@@ -72,14 +75,32 @@ The status flag indicating the presence of a passenger seems to be wrong in diff
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{img/passenger_status.png}
-\caption{$27,224$}
+\caption{Passenger status changes every 30 seconds (trajectory with id \textit{27,224})}
 \label{fig:passenger_status}
 \end{figure}
 
 
 \subsubsection{Jumps}
-GPS data tends to be imprecise by nature. 
+GPS data tends to be imprecise by nature. This results in inaccuracies as well as \quotes{jumps}. We define points that are most likely not real based on the driven speed as a jump. In order to get a better understanding of that, we depicted an example in figure \ref{fig:jump}. The green line shows an example route as it also appears in the dataset. The numbers next to the line represent the driven speed in $\frac{km}{h}$ between two points $P_i$ and $P_{i+1}$. Point $P_4$ catches the eye of the observer. The speed of more than $200\frac{km}{h}$ within the city of Shenzhen might not be even possible. To avoid such cases, we developed a Python script, that analyzes the speed between two points. If it is higher than $150\frac{km}{h}$ we take the next point into account. In our example, we calculate the speed between $P_3$ and $P_5$. Is it less than $150\frac{km}{h}$ we delete the point in between (here $P_4$). Otherwise, there is a defect that is not trivially solvable.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/jumps.png}
+\caption{Example route containing a jump at $P_4$}
+\label{fig:jump}
+\end{figure}
+
+In some cases the amount of jumps is enormously high. In such cases, we delete the whole trajectory. More specifically, this means: Every trajectory having more than 200 jumps or having more than 100 jumps that cannot be fixed are removed. One extreme example for this can be seen in figure \ref{fig:more_jumps}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/more_jumps.png}
+\caption{Trajectory \textit{} having more than 2,000 jumps}
+\label{fig:more_jumps}
+\end{figure}
+
 \subsubsection{Summary: Data cleansing}
+All in all we removed more than eight Million records ($\approx 18\%$) and more than 4,134 trajectories ($28\%$) due to our data cleansing rules. Most of the criteria are chosen generously to avoid deleting false positives. Additionally, there might be other aspects to improve data quality. Since this was not the focus of our work, we decided not to go further into detail.
 
 \section{Application Prototype}
 
