@@ -61,33 +61,63 @@ The data was already imported into the database by our supervisor, when we start
 
 \section{Application Prototype}
 
-The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The profit can be estimated pretty accurately with the help of the distances and the tours' start and end times. We mention distance and profit calculations in section \ref{todo}. The list is sorted by the estimated profit. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
+The main purpose of our application prototype is to display good performing taxis on a map. Thereby, the user can analyze how taxis get new passengers quickly. An additional task is to visualize the state at a certain time of the day. For that, we created some heatmaps (see section \ref{sec:heatmaps}).
 
-\begin{figure}[h]
-\label{fig:ranking}
+\subsection{Explore Profitable Taxis}
+
+The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The profit can be estimated pretty accurately with the help of the distances and the tours' start and end times. We mention distance and profit calculations in section \ref{todo} in more detail. The list is sorted by the estimated profit. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
+
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{img/ranking.png}
 \caption{Ranking of the most profitable taxis}
+\label{fig:ranking}
 \end{figure}
 
+Figure \ref{fig:single_ride} illustrates how the taxi routes are drawn. The line is red if the taxi was driven without a passenger. The line is green if it had a passenger. Arrows indicate the direction. At the end of each tour is a a Yuan symbol on which the user can click. The click lets pop up information about the tour (i.e. start time, end time, distance and the estimated profit).\\
 
-Figure \ref{fig:single_ride} illustrates how the taxi routes are drawn. The line is red if the taxi was driven without a passenger. The line is green if it had a passenger. Arrows indicate the direction. At the end of a tour is always a Yuan symbol on which the user can click. The click lets pop up information about the tour (i.e. start time, end time, distance and the estimated profit).\\
-
-\begin{figure}[h]
-\label{fig:single_ride}
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{img/single_ride.png}
 \caption{Information about one ride}
+\label{fig:single_ride}
 \end{figure}
 
-\begin{figure}[h]
-\label{fig:best_taxi}
+Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID 36290 in figure \ref{fig:ranking}). You can see that this taxi had the most tours in one area. The taxi had 83 tours during the day. These tours sum up to a distance of 482 kilometers. The red lines are often very short.
+
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{img/best_taxi.png}
 \caption{Entire taxi route}
+\label{fig:best_taxi}
 \end{figure}
 
+\subsection{Heatmaps}
+\label{sec:heatmaps} 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/density.png}
+\caption{Taxi density heatmap}
+\label{fig:density}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/pickup.png}
+\caption{Pickup points heatmap}
+\label{fig:pickup}
+\end{figure}
+
+
 \subsection{System Architecture}
+
+\begin{figure*}
+\centering
+\includegraphics[width=0.8\textwidth]{img/architecture.png}
+\caption{System architecture}
+\label{fig:architecture}
+\end{figure*}
 
 \subsection{Data Layouts}
 
