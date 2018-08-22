@@ -54,9 +54,31 @@ Before we started analyzing the trajectories we had a closer look at the dataset
 The data was already imported into the database by our supervisor, when we started our project. Since, we did not want to change the the original data we created an own table. Once we wanted to create a primary key, the database has thrown an error stating that the data has duplicate values. In fact, there are 381 data points occuring not only twice, but also multiple times. We deleted those entries, because they do not add any value to the data and prevent the creation of a primary key.
 
 \subsubsection{Bounding box}
+Generally, GPS coordinates are not completely accurate. However, there are points in the data set, that do not make sense, are not even possible or do not fit into the geospatial system of longitudes and latidues. The graphic \ref{fig:bbox} below shows the trajectory with id $22,360$ which passes through the ocean. In order to eliminate such outliers, we use a bounding box (rectangle highlighted in red color). To avoid deleting points that are outside this area, because there a taxi really drove there, we have chosen the rectangle intentionally large. This data cleansing step effects almost 8,000 GPS points.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/bounding_box.png}
+\caption{Bounding box and trajectory $22,360$ passing through the ocean}
+\label{fig:bbox}
+\end{figure}
+
+
 \subsubsection{Small trajectories}
 \subsubsection{Wrong passenger status}
+The status flag indicating the presence of a passenger seems to be wrong in different trajectories. We found three different scenarios and removed the whole trajetory if at least one is fulfilled. First, there are trips passing through the whole city without any passengers at all. Second, the opposite is the case: Taxis do have the same passenger for almost a day. We filtered those trajectories out by adding rules. We assume, that a taxi is supposed to have a passenger for at least two hours (not necessarily continously) and no passenger for at least one hour (also not continously) within the recorded day. In the third case, the passenger status keeps switching over time as depicted in graphic \ref{fig:passenger_status}. In order to avoid wrong calculations based on the false data, we deleted the whole trajectories.
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/passenger_status.png}
+\caption{$27,224$}
+\label{fig:passenger_status}
+\end{figure}
+
+
 \subsubsection{Jumps}
+GPS data tends to be imprecise by nature. 
 \subsubsection{Summary: Data cleansing}
 
 \section{Application Prototype}
