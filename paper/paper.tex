@@ -143,12 +143,12 @@ The heatmap can visualize two other things. One of these is the number of picked
 
 This section is about our architecture. Figure \ref{fig:architecture} is a FMC (Fundamental Modeling Concepts) diagram. Our architecture can be divided into the three components frontend, backend and database. We have a web application. Hence, it runs in a browser. We are using the Google Maps API. In our frontend, we are using HTML5 and Javascript.\\
 
-\begin{figure*}
+\begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{img/architecture.png}
+\includegraphics[width=0.5\textwidth]{img/architecture.png}
 \caption{System architecture}
 \label{fig:architecture}
-\end{figure*}
+\end{figure}
 
 The backend essentially has a REST API which is written in Python and uses the Flask framework. It serves the static HTML and Javascript files, as well as redirecting requests to the database. The backend also has a few python scripts that are used to create tables and for the data cleansing.
 
