@@ -14,7 +14,8 @@
 \title{
   % \includegraphics[width=0.2\textwidth]{hpi_logo_2017}\\
   \vspace{24pt}
-  In-Memory Trajectory Analysis on Taxi Data
+  % In-Memory Trajectory Analysis on Taxi Data
+  Comparison of Different Data Layouts for Columnar In-Memory Databases on the Basis of an Example Application
 }
 \subtitle{
   Seminar Trends and Concepts 3\\
@@ -24,9 +25,7 @@
 \numberofauthors{3}
 
 \author{
-  Marcel Jankrift\\
-  Sebastian Kliem\\
-  Toni Stachewicz\\[12pt]
+  Marcel Jankrift, Sebastian Kliem, Toni Stachewicz\\[12pt]
   Supervisors:\\
   Dr. Matthias Uflacker, Keven Richly
 }
@@ -40,6 +39,10 @@ The taxi business is an extremely competitive market. Private ridesharing compan
 \keywords{Geospatial data, Trajectory analysis, Taxi data, In-Memory}
 
 \section{Motivation}
+
+Storing trajectory data in traditional relational databases is not always the best idea. Requests might take a long time when working on big data sets. It is also difficult to achieve good compression rates. There exist some systems which are purely designed to work with such trajectories. Those systems are performing much better than the traditional databases.
+
+In our project we would like to investiage how a columnar in-memory database can handle trajectory data. Thereby, we can make use of the in-memory architecture and of the columnar storage benefits. We developed an example application which covers a lot of real world requests to a large trajectory data set. This application builds a good basis to benchmark different data layouts and optimizations.
 
 Traditional taxi companies like to increase their profit. For that, the individual taxi drivers would have to find many passengers and minimize their waiting times. A way to be a  good performing taxi is to stay in a profitable area of the city. For example, where taxi rides are highly needed at a specific time. With our help, the taxi companies can develop new strategies. A simple strategy would be to only accept and assign orders whose destination is in a good area for the expected arrival time. We created an interactive map, which shows the best performing taxis for one day in Shenzhen. This is based on a data set that is explained in section \ref{sec:ds}. The application has some additional information about the taxi density and numbers about pick-ups and drop-offs. Taxi companies could use the application to quickly analyze the collected GPS data.\\
 
@@ -106,9 +109,17 @@ All in all we removed more than eight Million records ($\approx 18\%$) and more 
 
 The main purpose of our application prototype is to display good performing taxis on a map. Thereby, the user can analyze how taxis get new passengers quickly. An additional task is to visualize the state at a certain time of the day. For that, we created some heatmaps (see section \ref{sec:heatmaps}).
 
+\subsection{Taxi Profit Calculation}
+
+The profit can be estimated with the help of the distances and the tours' start and end times. We checked the taxi fares in Shenzhen on the website Numbeo which is a database about taxi fares worldwide\footnote{\href{https://www.numbeo.com/taxi-fare/country_result.jsp?country=China}{https://www.numbeo.com/taxi-fare}}. The website says that the start of a taxi tour costs 11.00 Chinese Yuan. Then it costs 2.50 Yuan per kilometer. We have the GPS coordinates and know where a tour starts and ends. Because of that, we can calculate the driven distance and get an accurate kilometer price.
+
+Waiting time is a component of the tour's price as well. Numbeo says that it is 48 Yuan per hour. We defined for our application that 10\% of the total time of a tour is waiting time. That is obviously not the real waiting cost for each tour, just a guess. Nevertheless, it should suffice for our prototype. A better approach would be to calculate the speed of the taxis to check if it was waiting or driving at the time.
+
+The prices of all tours can be summed up to the profit of a taxi over the whole day. At this point we have a profit estimation for each taxi.
+
 \subsection{Explore Profitable Taxis}
 
-The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The profit can be estimated pretty accurately with the help of the distances and the tours' start and end times. We mention distance and profit calculations in section \ref{todo} in more detail. The list is sorted by the estimated profit. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
+The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The list is sorted by the estimated profit which was explained in the previous section. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
 
 \begin{figure}[ht]
 \centering
@@ -138,7 +149,7 @@ Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID \text
 \subsection{Heatmaps}
 \label{sec:heatmaps}
 
-The application has a taxi density heatmap (see figure \ref{fig:density}). The areas, which have many taxis at the given time, are colored red. Areas with less taxis are colored blue. The user interface has a time slider. When changing the time from \textit{15:00} to another time, the map would refresh. In the top left corner is a play button. With the play function, the map continually updates to the next time interval. Thus, the user can observe how the taxi density changes over time.
+The application has a taxi density heatmap (see figure \ref{fig:density}). The areas, which have many taxis at the given time, are colored red. Areas with less taxis are colored blue. The user interface has a time slider. When changing the time from 3:00 PM to another time, the map would refresh. In the top left corner is a play button. With the play function, the map continually updates to the next time interval. Thus, the user can observe how the taxi density changes over time.
 
 \begin{figure}[ht]
 \centering
@@ -147,25 +158,18 @@ The application has a taxi density heatmap (see figure \ref{fig:density}). The a
 \label{fig:density}
 \end{figure}
 
-The heatmap can visualize two different things. One of these is the number of picked up passengers. The other one is the number of dropped passengers. Figure \ref{fig:pickup} shows a screenshot with the pickup points heatmap. The user interface has a dropdown menu to let the user select which heatmap is displayed.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{img/pickup.png}
-\caption{Pickup points heatmap}
-\label{fig:pickup}
-\end{figure}
+The heatmap can visualize two other things. One of these is the number of picked up passengers. The other one is the number of dropped passengers. The user interface has a dropdown menu to let the user select which heatmap is displayed.
 
 \subsection{System Architecture}
 
 This section is about our architecture. Figure \ref{fig:architecture} is a FMC (Fundamental Modeling Concepts) diagram. Our architecture can be divided into the three components frontend, backend and database. We have a web application. Hence, it runs in a browser. We are using the Google Maps API. In our frontend, we are using HTML5 and Javascript.\\
 
-\begin{figure*}
+\begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{img/architecture.png}
+\includegraphics[width=0.5\textwidth]{img/architecture.png}
 \caption{System architecture}
 \label{fig:architecture}
-\end{figure*}
+\end{figure}
 
 The backend essentially has a REST API which is written in Python and uses the Flask framework. It serves the static HTML and Javascript files, as well as redirecting requests to the database. The backend also has a few python scripts that are used to create tables and for the data cleansing.
 
@@ -174,19 +178,15 @@ The database, which we are using, is SAP HANA. It stores all of the data in diff
 The communication between the backend and the database in managed via pyHANA\footnote{\href{https://github.com/hpi-epic/pyHANA}{https://github.com/hpi-epic/pyHANA}}. pyHANA is a Python client for SAP HANA.
 
 
-\subsection{Data Layouts}
+\section{Data Layouts}
 \label{sec:data_layouts}
 
 \subsection{Optimizations}
 
 \section{Benchmark Results}
 
-\section{Future Work}
-
-% mehr daten hinzufuegen. kein problem, da alle queries optimiert wurden 
-
 \section{Conclusion}
 
-\section{References}
+% \section{References}
 
 \end{document}
