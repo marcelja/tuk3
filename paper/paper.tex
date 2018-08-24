@@ -88,9 +88,17 @@ GPS data tends to be imprecise by nature.
 
 The main purpose of our application prototype is to display good performing taxis on a map. Thereby, the user can analyze how taxis get new passengers quickly. An additional task is to visualize the state at a certain time of the day. For that, we created some heatmaps (see section \ref{sec:heatmaps}).
 
+\subsection{Taxi Profit Calculation}
+
+The profit can be estimated with the help of the distances and the tours' start and end times. We checked the taxi fares in Shenzhen on the website Numbeo which is a database about taxi fares worldwide\footnote{\href{https://www.numbeo.com/taxi-fare/country_result.jsp?country=China}{https://www.numbeo.com/taxi-fare}}. The website says that the start of a taxi tour costs 11.00 Chinese Yuan. Then it costs 2.50 Yuan per kilometer. We have the GPS coordinates and know where a tour starts and ends. Because of that, we can calculate the driven distance and get an accurate kilometer price.
+
+Waiting time is a component of the tour's price as well. Numbeo says that it is 48 Yuan per hour. We defined for our application that 10\% of the total time of a tour is waiting time. That is obviously not the real waiting cost for each tour, just a guess. Nevertheless, it should suffice for our prototype. A better approach would be to calculate the speed of the taxis to check if it was waiting or driving at the time.
+
+The prices of all tours can be summed up to the profit of a taxi over the whole day. At this point we have a profit estimation for each taxi.
+
 \subsection{Explore Profitable Taxis}
 
-The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The profit can be estimated pretty accurately with the help of the distances and the tours' start and end times. We mention distance and profit calculations in section \ref{todo} in more detail. The list is sorted by the estimated profit. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
+The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The list is sorted by the estimated profit which was explained in the previous section. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
 
 \begin{figure}[ht]
 \centering
