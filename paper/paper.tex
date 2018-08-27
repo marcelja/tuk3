@@ -49,7 +49,7 @@ Traditional taxi companies like to increase their profit. For that, the individu
 \section{Data Sources}
 \label{sec:ds}
 
-The data we used is a freely available collection of GPS information of taxis.\footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/\\UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12 AM and 23:59 PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. The total memory consumption without any further optimization (e.g. indices) of the Shenzhen data takes 541 MB.
+The data we used is a freely available collection of GPS information of taxis.\footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/\\UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12 AM and 23:59 PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. One sample point contains six attributes: trajectory id (TID), longitude, latitude, timestamp, speed and a flag indicating the presence of a passenger.
 
 \subsection{Data Cleansing}
 Before we started analyzing the trajectories we had a closer look at the dataset itself. We noticed rather soon, that there are some inconsistencies within data. Hence, we perform data cleansing. In the following paragraphs, we describe our criteria for data cleansing in detail.
@@ -180,6 +180,14 @@ The communication between the backend and the database in managed via pyHANA\foo
 
 \section{Data Layouts}
 \label{sec:data_layouts}
+A crucial factor for SQL query performance is the way the data is stored. Therefore, we tried out three different layouts which we want to present in this section.
+\subsection{Sample point format}
+The sample point format is similar to the way the data is stored in the CSV-file. Each GPS sample corresponds to one row within the database. Furthermore, each attribute is stored in one column without any manual encoding.
+
+The layout has two major advantages. Firstly, the data can be accessed directly. There is no need for further calculation or modification if a specific value is accessed. Second, the data stays as it is. Since there is no normailization, we always have the full dataset in hand.
+
+\subsection{Frames format}
+\subsection{Key-Value format}
 
 \subsection{Optimizations}
 
