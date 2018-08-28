@@ -184,9 +184,16 @@ A crucial factor for SQL query performance is the way the data is stored. Theref
 \subsection{Sample point format}
 The sample point format is similar to the way the data is stored in the CSV-file. Each GPS sample corresponds to one row within the database. Furthermore, each attribute is stored in one column without any manual encoding.
 
-The layout has two major advantages. Firstly, the data can be accessed directly. There is no need for further calculation or modification if a specific value is accessed. Second, the data stays as it is. Since there is no normailization, we always have the full dataset in hand.
+The layout has three major advantages. First, the data can be accessed directly. There is no need for further calculation or modification in order to obtain a specific value. Second, the data stays as it is. Since there is no normalization, we always have the full dataset in hand. Additionally, the amenities of column store can be exploited. SAP Hana supports various internal compression types in order to reduce the amount of memory used. Less data has to be loaded from memory, which leads to a higher throughput and faster query execution times.
 
-\subsection{Frames format}
+The whole table consumes about 498 MB of main memory after applying the data cleansing rules. We prefer the column store over the row store in this case.
+
+\subsection{Frame format}
+Another way of storing the information is the frame format. This approach is presented by Wang et al.~\cite{wang} The main idea behind this layout is splitting the sample sample points into frame groups of a fixed length with a fixed frequency of data points. We decided to use a frame size of 15 seconds, since this is the median frequency the data was recorded (see \ref{sec:ds}). TODO frame groups length
+
+This approach avoids using timestamps, which is a major advantage in term of memory consumption. Also querying a time series is supposed to be faster compared to the frame format. However, the different positions within the frames have to be calculated, which can be a tedious thing. Due to the use of frames the data is normalized by time on the one hand. On the other hand, there is a loss of information. Furthermore, there could be the possibility of missing points. In this case, Wang et al.~\cite{wang}calculate those points via SED distance. We refrain from that. The overall frame format table with a framegroup size of ten minutes and a frame size of 15 seconds consumes circa 441 MB of main memory, when stored in column layout.
+
+
 \subsection{Key-Value format}
 
 \subsection{Optimizations}
@@ -194,7 +201,8 @@ The layout has two major advantages. Firstly, the data can be accessed directly.
 \section{Benchmark Results}
 
 \section{Conclusion}
-
-% \section{References}
+% \bibliographystyle{ACM-Reference-Format}
+\bibliographystyle{plain}
+\bibliography{references}
 
 \end{document}
