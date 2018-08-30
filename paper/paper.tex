@@ -169,14 +169,7 @@ The user can see a ranking of the taxis, which had the most profit during the da
 \label{fig:ranking}
 \end{figure}
 
-Figure \ref{fig:single_ride} illustrates how the taxi routes are drawn. The line is red if the taxi was driven without a passenger. The line is green if it had a passenger. Arrows indicate the direction. At the end of each tour is a a Yuan symbol on which the user can click. The click lets pop up information about the tour (i.e. start time, end time, distance and the estimated profit).\\
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{img/single_ride.png}
-\caption{Information about one ride}
-\label{fig:single_ride}
-\end{figure}
+The red part of the drawn line indicates the taxi was driven without a passenger. The line is green if it had a passenger. Arrows indicate the direction. At the end of each tour is a a Yuan symbol on which the user can click. The click lets pop up information about the tour (i.e. start time, end time, distance and the estimated profit).\\
 
 Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID \textit{36290} in figure \ref{fig:ranking}). You can see that this taxi had the most tours in one area. The taxi had 83 tours during the day. These tours sum up to a distance of 482 kilometers. The red lines are often very short.
 
@@ -190,14 +183,7 @@ Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID \text
 \subsection{Heatmaps}
 \label{sec:heatmaps}
 
-The application has a taxi density heatmap (see figure \ref{fig:density}). The areas, which have many taxis at the given time, are colored red. Areas with less taxis are colored blue. The user interface has a time slider. When changing the time from 3:00 PM to another time, the map would refresh. In the top left corner is a play button. With the play function, the map continually updates to the next time interval. Thus, the user can observe how the taxi density changes over time.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{img/density.png}
-\caption{Taxi density heatmap}
-\label{fig:density}
-\end{figure}
+The application has a taxi density heatmap. The areas, which have many taxis at the given time, are colored red. Areas with less taxis are colored blue. The user interface has a time slider. When changing the time from 3:00 PM to another time, the map would refresh. In the top left corner is a play button. With the play function, the map continually updates to the next time interval. Thus, the user can observe how the taxi density changes over time.
 
 The heatmap can visualize two other things. One of these is the number of picked up passengers. The other one is the number of dropped passengers. The user interface has a dropdown menu to let the user select which heatmap is displayed.
 
@@ -245,7 +231,7 @@ This approach avoids using timestamps, which is a major advantage in terms of me
 
 \subsection{Key-Value format}
 
-A third storage layout we evaluated is the key-value format. Therefore, we decided to encode a whole trajectory as an array of arrays containing longitude, latitude and the corresponding timestamp. Since an array cannot be stored in the SAP Hana database, we take its string representation and filed it in a column of data type \textit{NCLOB}. An example can be found in code listing \ref{lst:json}. We do not normalize by time. Hence, there is no loss in terms of GPS data. Besides this information, there are the trajectory identifier, start and end time and the mininum bounding rectangle present in the table. In total, there are 10,594 (equivalent to the amount of trajectories after data cleansing) consuming about 650 MB of main memory in column store.
+A third storage layout we evaluated is the key-value format. Therefore, we decided to encode a whole trajectory as an array of arrays containing longitude, latitude and the corresponding timestamp. Since an array cannot be stored in the SAP HANA database, we take its string representation and filed it in a column of data type \textit{NCLOB}. An example can be found in code listing \ref{lst:json}. We do not normalize by time. Hence, there is no loss in terms of GPS data. Besides this information, there are the trajectory identifier, start and end time and the mininum bounding rectangle present in the table. In total, there are 10,594 (equivalent to the amount of trajectories after data cleansing) consuming about 650 MB of main memory in column store.
 
 \lstset{language=json}
 \begin{minipage}{0.45\textwidth}
