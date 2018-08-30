@@ -49,7 +49,7 @@ Traditional taxi companies like to increase their profit. For that, the individu
 \section{Data Sources}
 \label{sec:ds}
 
-The data we used is a freely available collection of GPS information of taxis.\footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/\\UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12 AM and 23:59 PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. One sample point contains six attributes: trajectory id (TID), longitude, latitude, timestamp, speed and a flag indicating the presence of a passenger.
+The data we used is a freely available collection of GPS information of taxis.\footnote{\href{https://www-users.cs.umn.edu/~tianhe/BIGDATA/UrbanCPS/TaxiData/TaxiData}{https://www-users.cs.umn.edu/$\sim$tianhe/BIGDATA/\\UrbanCPS/TaxiData/TaxiData}} The dataset set has been collected over one day starting at 12~AM and 23:59~PM in the city of Shenzhen, China and the surrounding area. The data does not only contain the GPS location at a certain time, but also the current speed and the taxi's occupancy. The status of a driving taxi has been recorded in an average interval of 26.85 seconds or every 15 seconds in median. In total there are 14,728 trajectories traced resulting in almost 47 million records. The data comes in CSV-format which can be loaded into the SAP HANA database immediately. One sample point contains six attributes: trajectory id (TID), longitude, latitude, timestamp, speed and a flag indicating the presence of a passenger.
 
 \subsection{Data Cleansing}
 Before we started analyzing the trajectories we had a closer look at the dataset itself. We noticed rather soon, that there are some inconsistencies within data. Hence, we perform data cleansing. In the following paragraphs, we describe our criteria for data cleansing in detail.
@@ -189,14 +189,28 @@ The layout has three major advantages. First, the data can be accessed directly.
 The whole table consumes about 498 MB of main memory after applying the data cleansing rules. We prefer the column store over the row store in this case.
 
 \subsection{Frame format}
-Another way of storing the information is the frame format. This approach is presented by Wang et al.~\cite{wang} The main idea behind this layout is splitting the sample sample points into frame groups of a fixed length with a fixed frequency of data points. We decided to use a frame size of 15 seconds, since this is the median frequency the data was recorded (see \ref{sec:ds}). TODO frame groups length
+Another way of storing the information is the frame format. This approach is presented by Wang et al.~\cite{wang} The main idea behind this layout is splitting the sample sample points into frame groups of a fixed length with a fixed frequency of data points. We decided to use a frame size of 30 seconds and a frame group size of one hour as described in the paper by Wang et al.
 
-This approach avoids using timestamps, which is a major advantage in term of memory consumption. Also querying a time series is supposed to be faster compared to the frame format. However, the different positions within the frames have to be calculated, which can be a tedious thing. Due to the use of frames the data is normalized by time on the one hand. On the other hand, there is a loss of information. Furthermore, there could be the possibility of missing points. In this case, Wang et al.~\cite{wang}calculate those points via SED distance. We refrain from that. The overall frame format table with a framegroup size of ten minutes and a frame size of 15 seconds consumes circa 441 MB of main memory, when stored in column layout.
+In order to keep the right order of the data points after splitting a trajetory into multiple frame groups a frame group identifier (\textit{FGCID}) has to be introduced (cf. figure \ref{fig:frame_format}). The starting point's GPS location of a frame group is stored in the column \textit{IFX} (longitude) and \textit{IFX} (latitude). In order to save memory the subsequent points are encoded as the deltas of the coordinates. The columns are named \textit{PF0X, PF0Y, PF1X, PF1Y, ..., PF119X, PF119Y}. Hence the frame format table consists of 244 columns.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.48\textwidth]{img/frame_format.png}
+\caption{Information stored in frame format}
+\label{fig:frame_format}
+\end{figure}
+
+This approach avoids using timestamps, which is a major advantage in term of memory consumption. Also querying a time series is supposed to be faster compared to the frame format. However, the different positions within the frames have to be calculated, which can be a tedious thing. Due to the use of frames the data is normalized by time on the one hand. On the other hand, there is a loss of information. Furthermore, there could be the possibility of missing points. In this case, Wang et al.~\cite{wang} calculate those points via SED distance. We refrain from that. The overall frame format table with a framegroup size of ten minutes and a frame size of 15 seconds consumes circa 441 MB of main memory, when stored in column layout.
 
 
 \subsection{Key-Value format}
 
+A third approach we evaluated is the key-value format.
 \subsection{Optimizations}
+
+
+this layout is splitting the sample sample points into frame groups of a fixed length with a fixed frequency of data points. We decided to use a frame size of 15 seconds, since this is the median frequency the data was recorded (see \ref{sec:ds}). Furthermore, we use a frame group size of ten minutes.
+
 
 \section{Benchmark Results}
 
