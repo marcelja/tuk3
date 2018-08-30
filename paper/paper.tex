@@ -269,11 +269,23 @@ A third storage layout we evaluated is the key-value format. Therefore, we decid
 
 \subsection{Optimizations}
 
+\subsubsection{Sample point format}
 
-this layout is splitting the sample sample points into frame groups of a fixed length with a fixed frequency of data points. We decided to use a frame size of 15 seconds, since this is the median frequency the data was recorded (see section \ref{sec:ds}). Furthermore, we use a frame group size of ten minutes.
+Since the data neither changes nor grows anymore, we decided to store the information in sorted order. As sorting key we utilized the trajectory identifier and the timestamp. In order to speed up window queries we materialized a unique identifier, which is the row ID. This ID simplifies the creation of a primary key. Otherwise, a primary key would have to include multiple columns, most likely all of them. The Hana database automatically creates an index on this column. Furthermore, we realized that timestamp operations perform relatively bad. In order to avoid timestamps we calculate the amount of seconds lasted and store those as an integer in the database. The speed improvement of this optimization will be examined in the next section (see section \ref{sec:bench_ts}).
 
+\subsubsection{Frame format}
+Wang et al.~\cite{wang} have chosen a frame size of 30 seconds. In our opinion, this interval is relatively large. A presented in section \ref{sec:ds} the median frequency of data points is 15 seconds. Therefore, we adopted the frame size. By changing this value, the frame group size increases as well. This would lead to having 484 columns in the frame format table. Querying data becomes an error-prone task. Thus, we decreased the frame group size to ten minutes.
+
+Additionally, we added the information of speed and occupancy per frame. Those fields are important for our application.
 
 \section{Benchmark Results}
+
+\subsection{Application specific benchmarks}
+
+\subsubsection{timestamps}
+\label{sec:bench_ts}
+
+\subsection{Application independent benchmarks}
 
 \section{Conclusion}
 
