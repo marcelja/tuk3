@@ -170,15 +170,15 @@ The main purpose of our application prototype is to display good performing taxi
 
 \subsection{Taxi Profit Calculation}
 
-The profit can be estimated with the help of the distances and the tours' start and end times. We checked the taxi fares in Shenzhen on the website Numbeo which is a database about taxi fares worldwide\footnote{\href{https://www.numbeo.com/taxi-fare/country_result.jsp?country=China}{https://www.numbeo.com/taxi-fare}}. The website says that the start of a taxi tour costs 11.00 Chinese Yuan. Then it costs 2.50 Yuan per kilometer. We have the GPS coordinates and know where a tour starts and ends. Because of that, we can calculate the driven distance and get an accurate kilometer price.
+The profit can be estimated with the help of the distances and the tours' start and end times. We checked the taxi fares in Shenzhen on the website Numbeo which is a database about taxi fares worldwide\footnote{\href{https://www.numbeo.com/taxi-fare/country_result.jsp?country=China}{https://www.numbeo.com/taxi-fare}}. The website states that the start of a taxi tour costs 11.00 Chinese Yuan. Then it costs 2.40 Yuan per kilometer. We have the GPS coordinates and know where a tour starts and ends. Because of that, we can calculate the driven distance and get an accurate kilometer price.
 
-Waiting time is a component of the tour's price as well. Numbeo says that it is 48 Yuan per hour. We defined for our application that 10\% of the total time of a tour is waiting time. That is obviously not the real waiting cost for each tour, just a guess. Nevertheless, it should suffice for our prototype. A better approach would be to calculate the speed of the taxis to check if it was waiting or driving at the time.
+Waiting time is a component of the tour's price as well. Numbeo says that it is 48 Yuan per hour. We defined for our application that 10 percent of the total time of a tour is waiting time. That is obviously not the real waiting cost for each tour, just a guess. Nevertheless, it should suffice for our prototype. A better approach would be to calculate the speed of the taxis to check if it was waiting or driving at the time.
 
 The prices of all tours can be summed up to the profit of a taxi over the whole day. At this point we have a profit estimation for each taxi.
 
 \subsection{Explore Profitable Taxis}
 
-The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The list is sorted by the estimated profit which was explained in the previous section. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.\\
+The user can see a ranking of the taxis, which had the most profit during the day. This is shown in figure \ref{fig:ranking}. The list has information about the number of tours. We also calculated the distance of each taxi while passengers were inside. This is displayed in the column \textbf{Distance km}. The list is sorted by the estimated profit which is explained in the previous section. It is displayed as the Chinese currency Yuan. When the user clicks on an entry the route for the taxi is drawn on the map.
 
 \begin{figure}[ht]
 \centering
@@ -187,7 +187,7 @@ The user can see a ranking of the taxis, which had the most profit during the da
 \label{fig:ranking}
 \end{figure}
 
-The red part of the drawn line indicates the taxi was driven without a passenger. The line is green if it had a passenger. Arrows indicate the direction. At the end of each tour is a a Yuan symbol on which the user can click. The click lets pop up information about the tour (i.e. start time, end time, distance and the estimated profit).\\
+The red part of the drawn line indicates the taxi was driven without a passenger. The line is green if it had a passenger. Arrows indicate the direction. At the end of each tour is a Yuan symbol on which the user can click. The click lets some information about the tour (i.e. start time, end time, distance and the estimated profit) pop up.
 
 Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID \textit{36290} in figure \ref{fig:ranking}). You can see that this taxi had the most tours in one area. The taxi had 83 tours during the day. These tours sum up to a distance of 482 kilometers. The red lines are often very short.
 
@@ -201,13 +201,13 @@ Figure \ref{fig:best_taxi} shows the route of the most profitable taxi (ID \text
 \subsection{Heatmaps}
 \label{sec:heatmaps}
 
-The application has a taxi density heatmap. The areas, which have many taxis at the given time, are colored red. Areas with less taxis are colored blue. The user interface has a time slider. When changing the time from 3:00 PM to another time, the map would refresh. In the top left corner is a play button. With the play function, the map continually updates to the next time interval. Thus, the user can observe how the taxi density changes over time.
+The application has a taxi density heatmap. The areas, which have many taxis at the given time, are colored red. Areas with less taxis are colored blue. The user interface has a time slider. When changing the time from 3:00 PM to another time, the map refreshes. In the top left corner is a play button. With the play function, the map continually updates to the next time interval. Thus, the user can observe how the taxi density changes over time.
 
 The heatmap can visualize two other things. One of these is the number of picked up passengers. The other one is the number of dropped passengers. The user interface has a dropdown menu to let the user select which heatmap is displayed.
 
 \subsection{System Architecture}
 
-This section is about our architecture. Figure \ref{fig:architecture} is a FMC (Fundamental Modeling Concepts) diagram. Our architecture can be divided into the three components frontend, backend and database. We have a web application. Hence, it runs in a browser. We are using the Google Maps API. In our frontend, we are using HTML5 and Javascript.\\
+This section is about our architecture. Figure \ref{fig:architecture} is an FMC (Fundamental Modeling Concepts) diagram. Our architecture can be divided into the three components frontend, backend and database. Since we have a web application, it runs in a browser. We are using the Google Maps API. In our frontend, we are using HTML5 and Javascript.
 
 \begin{figure}[ht]
 \centering
@@ -216,9 +216,9 @@ This section is about our architecture. Figure \ref{fig:architecture} is a FMC (
 \label{fig:architecture}
 \end{figure}
 
-The backend essentially has a REST API which is written in Python and uses the Flask framework. It serves the static HTML and Javascript files, as well as redirecting requests to the database. The backend also has a few Python scripts that are used to create tables and for the data cleansing.
+The backend essentially has a REST API which is written in Python and uses the Flask framework. It serves the static HTML and Javascript files, as well as redirecting requests to the database. The backend also has a few Python scripts that are used to create tables and perform data cleansing.
 
-The database, which we are using, is SAP HANA. It stores all of the data in different table formats. The table formats are elaborated in section \ref{sec:data_layouts}. The database has some procedures that can be executed to answer non trivial data requests (e.g. to get the calculated profits).
+The database we are using, is SAP HANA. It stores all the data in different table formats. The table formats are elaborated in section \ref{sec:data_layouts}. The database has some procedures that can be executed to answer non-trivial data requests (e.g. to get the calculated profits).
 
 The communication between the backend and the database in managed via pyHANA\footnote{\href{https://github.com/hpi-epic/pyHANA}{https://github.com/hpi-epic/pyHANA}}. pyHANA is a Python client for SAP HANA.
 
@@ -236,7 +236,7 @@ The whole table consumes about 498 MB of main memory after applying the data cle
 \subsection{Frame format}
 Another way of storing the information is the frame format. This approach is presented by Wang et al.~\cite{wang} The main idea behind this layout is splitting the sample points into frame groups of a fixed length with a fixed frequency of data points. We decided to use a frame size of 30 seconds and a frame group size of one hour as described in the paper by Wang et al.
 
-In order to keep the right order of the data points after splitting a trajetory into multiple frame groups a frame group identifier (\textit{FGCID}) has to be introduced (cf. figure \ref{fig:frame_format}). The starting point's GPS location of a frame group is stored in the column \textit{IFX} (latitude) and \textit{IFY} (longitude). In order to save memory the subsequent points are encoded as the deltas of the coordinates. The columns are named \textit{PF0X, PF0Y, PF1X, PF1Y, ..., PF119X, PF119Y}. Hence the frame format table consists of 244 columns.
+To keep the right order of the data points after splitting a trajetory into multiple frame groups a frame group identifier (\textit{FGCID}) has to be introduced (cf. figure \ref{fig:frame_format}). The starting point's GPS location of a frame group is stored in the column \textit{IFX} (latitude) and \textit{IFY} (longitude). In order to save memory the subsequent points are encoded as the deltas of the coordinates. The columns are named \textit{PF0X, PF0Y, PF1X, PF1Y, ..., PF119X, PF119Y}. Hence, the frame format table consists of 244 columns.
 
 \begin{figure}[ht]
 \centering
@@ -245,11 +245,11 @@ In order to keep the right order of the data points after splitting a trajetory 
 \label{fig:frame_format}
 \end{figure}
 
-This approach avoids using timestamps, which is a major advantage in terms of memory consumption. Also querying a time series is supposed to be faster compared to the frame format. However, the different positions within the frames have to be calculated, which can be a tedious thing. Due to the use of frames the data is normalized by time on the one hand. On the other hand, there is a loss of information. Furthermore, there could be the possibility of missing points. In this case, Wang et al.~\cite{wang} calculate those points via SED distance. We refrain from that. The overall frame format table with a framegroup size of ten minutes and a frame size of 15 seconds consumes circa 441 MB of main memory, when stored in column layout. In total, there are more than 2 million rows.
+This approach avoids using timestamps, which is a major advantage in terms of memory consumption. Also querying a time series is supposed to be faster compared to the frame format. However, the different positions within the frames have to be calculated, which can be a tedious thing. Due to the use of frames the data is normalized by time on the one hand. On the other hand, there is a loss of information. Furthermore, there could be the possibility of missing points. In this case, Wang et al.~\cite{wang} calculate those points via computing the SED distance. We refrain from that. The overall frame format table with a framegroup size of one hour and a frame size of 30 seconds consumes circa 441 MB of main memory, when stored in column layout. In total, there are more than 2 million rows.
 
 \subsection{Key-Value format}
 
-A third storage layout we evaluated is the key-value format. Therefore, we decided to encode a whole trajectory as an array of arrays containing longitude, latitude and the corresponding timestamp. Since an array cannot be stored in the SAP HANA database, we take its string representation and filed it in a column of data type \textit{NCLOB}. An example can be found in code listing \ref{lst:json}. We do not normalize by time. Hence, there is no loss in terms of GPS data. Besides this information, there are the trajectory identifier, start and end time and the mininum bounding rectangle present in the table. In total, there are 10,594 (equivalent to the amount of trajectories after data cleansing) consuming about 650 MB of main memory in column store.
+A third storage layout we evaluated is the key-value format. Therefore, we decided to encode a whole trajectory as an array of arrays containing longitude, latitude and the corresponding timestamp. Since an array cannot be stored in the SAP HANA database directly, we take its string representation and filed it in a column of data type \textit{NCLOB}. An example can be found in code listing \ref{lst:json}. We do not normalize by time. Hence, there is no loss in terms of GPS data. Besides this information, there are the trajectory identifier, start and end time and the mininum bounding rectangle present in the table. In total, there are 10,594 (equivalent to the amount of trajectories after data cleansing) consuming about 650 MB of main memory in column store.
 
 \lstset{language=json}
 \begin{minipage}{0.45\textwidth}
@@ -275,7 +275,7 @@ A third storage layout we evaluated is the key-value format. Therefore, we decid
 
 \subsubsection{Sample point format}
 
-Since the data neither changes nor grows anymore, we decided to store the information in sorted order. As sorting key we utilized the trajectory identifier and the timestamp. In order to speed up window queries we materialized a unique identifier, which is the row ID. This ID simplifies the creation of a primary key. Otherwise, a primary key would have to include multiple columns, most likely all of them. The HANA database automatically creates an index on this column. Furthermore, we realized that timestamp operations perform relatively bad. In order to avoid timestamps we calculate the amount of seconds lasted and store those as an integer in the database.
+Since the data neither changes nor grows anymore, we decided to store the information in sorted order. As sorting key we utilized the trajectory identifier and the timestamp. In order to speed up window queries we materialized a unique identifier, which is the row ID. This ID simplifies the creation of a primary key. Otherwise, a primary key would have to include multiple columns, most likely all of them. The HANA database automatically creates an index on this column. Furthermore, we realized that timestamp operations perform relatively bad. In order to avoid timestamps we calculate the amount of seconds lasted since midnight and store those as an integer in the database.
 
 \subsubsection{Frame format}
 Wang et al.~\cite{wang} have chosen a frame size of 30 seconds. In our opinion, this interval is relatively large. As presented in section \ref{sec:ds} the median frequency of data points is 15 seconds. Therefore, we adopted the frame size. By changing this value, the frame group size increases as well. This would lead to having 484 columns in the frame format table. Querying data becomes an error-prone task. Thus, we decreased the frame group size to ten minutes.
@@ -283,19 +283,19 @@ Wang et al.~\cite{wang} have chosen a frame size of 30 seconds. In our opinion, 
 Additionally, we added the information of speed and occupancy per frame. Those fields are important for our application.
 
 \section{Benchmark results}
-Our application executes several SQL statements. In order to improve their speed, we had to decide for one data storage layout during application development. Therefore, we created some benchmarks, which we want to present in this section. Moreover, we created benchmarks for use cases, that are not relevant for our software.
+Our application executes several SQL statements. In order to improve their speed, we had to decide for one data storage layout per query during application development. Therefore, we created some benchmarks, which we want to present in this section. Moreover, we created benchmarks for use cases, that are not relevant for our software.
 
 \subsection{Application specific benchmarks}
 In this section we present the benchmark results of the queries directly related to our application.
 
 \subsubsection{Get whole trajectory}
-In various situations we need to have a whole in hand. Therefore, we wrote SQL queries for each storage layout. The query execution times are shown in graphic \ref{fig:bench_whole_trajectory}. In order to create the statistics we ran the queries 100 times. The time is measured within our Python server and encoompasses the whole recreation. Network latency between the server and the database has not been measured. Hence, it is not part of the benchmark.
+In various situations we need to have a whole trajectory in hand. Therefore, we wrote SQL queries for each storage layout. The query execution times are shown in graphic \ref{fig:bench_whole_trajectory}. In order to create the statistics we ran the queries 100 times. The time is measured within our Python server and encompasses the whole recreation. Network latency between the server and the database has not been measured. Hence, it is not part of the benchmark.
 
-The slowest query execution time feature the sample point format. However, the data retrieved from the database does not need to be recreated in the Python backend. It can be used as it is.
+The slowest query execution time has the sample point format. Anyway, the data retrieved from the database does not need to be recreated in the Python backend. It can be used as it is.
 
-Recreating a trajectory in the frame format is faster in terms of retrieving the data from the database. However, in order to calculate the correct GPS coordinates there is a computation overhead. We have done this in the Python backend. An attempt of recreating the data via an SQL procedure using dynamic SQL failed due to extraordinary execution times. This takes 89.3 seconds, which is a performance decrease by factor 4000. An explanation for the high number could be, that dynamic SQL cannot be optimized well by the DBMS and runs in a single threaded style. The frame layout having a frame size of 15 seconds almost takes double the time as the frame size of 30 seconds. The reason for that, is the double amount of data.
+Recreating a trajectory in the frame format is faster in terms of retrieving the data from the database. However, in order to calculate the correct GPS coordinates there is a computation overhead. We have done this in the Python backend. An attempt of recreating the data via an SQL procedure using dynamic SQL failed due to extraordinary execution times. This takes 89.3 seconds, which is a performance decrease by factor 4000. An explanation for the high number could be, that dynamic SQL cannot be optimized well by the DBMS and runs in a single threaded style. An analysis of the query was not possible in this case, because the name server keeps crashing if we do so. The frame layout having a frame size of 15 seconds almost takes double the time as the frame size of 30 seconds. The reason for that, is the double amount of data.
 
-The fastest approach of trajectory recreation is the key-value format with an execution time of 9.5 microseconds. Querying the database becomes the fastest part, because only a single field is required. A huge amount of time is consumed by parsing the JSON string and creating a JSON object. Parsing the string within an SQL command does not represent an option for us, since this way is to error-prone.
+The fastest approach of trajectory recreation is the key-value format with an execution time of 9.5 microseconds. Querying the database becomes the fastest part, because only a single field is required. A huge amount of time is consumed by parsing the JSON string and creating a JSON object. Parsing the string within an SQL command does not represent an option for us, since this way is toos error-prone.
 
 \begin{figure}[ht]
 \centering
@@ -315,32 +315,32 @@ A key functionality of our software is the calculation of the profit per taxi. T
 % Die Werte haben sich schon geändert ;)
 The prices used for calculation are taken from a website.\footnote{\href{https://www.numbeo.com/taxi-fare/country\_result.jsp?country=China}{https://www.numbeo.com/taxi-fare/country\_result.jsp?country=China}} The values might have changed until now. However, prices will not change in a way, that our calculations become fundamentally wrong.
 
-The calculation of aspect one and two is trivial since these are only simple additions or multiplication. Determining the distance is a more complex part, that we want to describe in detail now.
+The calculation of aspect one and two is trivial since these are only simple additions or multiplications. Determining the distance is a more complex part, that we want to describe in detail now.
 
-To calculate the distance we demand to do it completely in the database. When querying a full trajectory we have to use the sample point format, since any other layout depends on the Python backend.
+To calculate the distance, we want to do it completely in the database. When querying a full trajectory we have to use the sample point format, since any other layout depends on the Python backend.
 
-The simplest way to get the distance of a ride is the usage of spatial points (\textit{ST\_POINTS}). This is a data type implemented in SAP HANA, that can be created out of a longitude and a latitude value. Furthermore, there is a function to compute the distance between those points. A single ride starts, when a passenger enters a taxi (occupancy changes from zero to one) and ends, when the passenger leaves (occupancy changes from one to zero). We sum up the lengths between all points sum uo all values for a whole trajectory.
+The simplest way to get the distance of a ride is the usage of spatial points (\textit{ST\_POINTS}). This is a data type implemented in SAP HANA, that can be created out of a longitude and a latitude value. Furthermore, there is a function to compute the distance between those points. A single ride starts, when a passenger enters a taxi (occupancy changes from zero to one) and ends, when the passenger leaves (occupancy changes from one to zero). We sum up the lengths between all points and all values for a whole trajectory.
 
-We performed a first run on the original unoptimized table. This takes more than eight minutes. A query execution of such a high duration is far away from real time calculation. Luckily, we have an improved table. However, the query execution time still takes 198 seconds, which is way to high. When looking into the query plan, we immediately see that the conversion of longitude and latitude to ST\_POINTS takes a tremendous amount of time (roughly 133 seconds). We then materialized the ST\_POINTS. The query now runs within 65 seconds. Compared to the eight minutes of the initial approach this result sounds great. Anyway, this duration is still too high to calculate the distances on demand.
+We performed a first run on the original unoptimized table. This takes more than eight minutes. A query execution of such a high duration is far away from real time computing. Luckily, we have an improved table. However, the query execution time still takes 198 seconds, which is way to high. When looking into the query plan, we immediately see that the conversion of longitude and latitude to \textit{ST\_POINTS} takes a tremendous amount of time (roughly 133 seconds). We then materialized the \textit{ST\_POINTS}. The query now runs within 65 seconds. Compared to the eight minutes of the initial approach this result sounds great. Anyway, this duration is still too high to calculate the distances on demand.
 
-Once again, a look into the query plan clarifies the problem. Almost 70 percent of the time is spent in determining the displacement between the points. When using ST\_POINTS the use of st\_distance cannot be avoided. Another alternative we considered is the implementation of an own method to compute the distances. The haversine formula seems to be well suited for our purpose. It determines the displacement of two points on a spherical object. The formula is defined as follows:
+Once again, a look into the query plan clarifies the problem. Almost 70 percent of the time is spent in determining the displacement between the points. When using \textit{ST\_POINTS} the use of \textit{st\_distance} cannot be avoided. Another alternative we considered is the implementation of an own method to compute the distances. The haversine formula seems to be well suited for our purpose. It determines the displacement of two points on a spherical object. The formula is defined as follows:
 
 \begin{equation} a = sin^2(\frac{\Delta_{lat}}{2}) + cos(lat_1) \cdot cos(lat_2) \cdot sin^2(\frac{\Delta_{lon}}{2}) \end{equation}
 \begin{equation} c = 2 \cdot atan2(\sqrt{a}, \sqrt{1 - a}) \end{equation}
 \begin{equation} d = R \cdot c \end{equation}
 
-where $lat$ is the latitude, $lon$ the longitude and R the Earth's radius, which is 6,367,000 meters. Since the radius depends on the location on the Earth, we assume a slight deviation. The standard deviation is 95 meters respectively 0.04 percent compared to the results of st\_distance. Indeed, the query execution time reduces to 7.6 seconds. This is a speed up of factor 8.5 . With this solution a calculation on demand becomes possible.
+where $lat$ is the latitude, $lon$ the longitude and $R$ the Earth's radius, which is 6,367,000 meters. Since the radius depends on the location on the Earth, we assume a slight deviation. In fact, the standard deviation is 95 meters respectively 0.04 percent compared to the results of \textit{st\_distance}. Indeed, the query execution time reduces to 7.6 seconds. This is a speed up of factor 8.5 . With this solution a calculation on demand becomes possible.
 
 \subsubsection{Get points from timeframe}
-For our heatmap is necessary to get all taxis within a specific time frame. With every returned GPS point the heatmap also gets a weight which indicates the number of taxis there. It is also possible to change the granularity of those GPS points. We did not implement this task for the Key-Value format, because the overhead of parsing the large string as JSON object before any further operations can be performed is too much.
+For our heatmap it is necessary to get all taxis within a specific time frame. With every returned GPS point the heatmap also gets a weight which indicates the number of taxis there. It is also possible to change the granularity of those GPS points. We did not implement this task for the key-value format, because the overhead of parsing the large string as JSON object before any further operations can be performed is too much.
 
-For the Points format all entries simply are filtered by their timestamp to be within the given period and, depending on the desired granilarity, rounded to a different amount of decimals. Afterwards the results are grouped by latitude and longitude to get the weight. This takes about 19 milliseconds.
+For the point format all entries are simply filtered by their timestamp to be within the given period and, depending on the desired granularity, rounded to a different amount of decimals. Afterwards the results are grouped by latitude and longitude to get the weight. This takes about 19 milliseconds.
 
-As the Frame format is geared to such time frames it should be much faster to get all points within a frame. Figure \ref{fig:bench_whole_trajectory} shows that with 14 milliseconds it is faster than the Points format, but only by a small amount. The reason for that is the delta encoding for all but the first coordinate within a frame. So for each found entry the coordinate needs to be calculated. After this is done, rounding the coordinates according to the granulatrity and grouping to get a weight is the same as for the Points format.
+As the frame format is geared to such time frames it should be much faster to get all points within a frame. Figure \ref{fig:bench_whole_trajectory} shows that with 14 milliseconds it is faster than the point format, but only by a small amount. The reason for that is the delta encoding for all but the first coordinate within a frame. So, for each entry found the coordinate needs to be calculated. After this is done, rounding the coordinates according to the granulatrity and grouping to get a weight is the same as for the point format.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.48\textwidth]{img/bench_single_frame.png}
-  \caption{Time in ms required for retrieving one single time frame}
+  \caption{Time in microseconds required for retrieving one single time frame}
   \label{fig:bench_whole_trajectory}
 \end{figure}
 
