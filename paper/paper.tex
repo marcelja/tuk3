@@ -377,13 +377,13 @@ We wanted to find out how these last two optimizations perform on a more complex
 \section{Conclusion}
 We managed to optimize the performance of many of our queries for each data layout. Nevertheless, none of the formats excels in all cases.
 
-The Frame format gears to the time aspect of trajectory data. So it suits best when queries are about the continuous points within a time frame. For our example use case, we are rather interested in specific points in time or aggregated information about a timespan. Therefore, before the data has the desired format to work with, some additional steps always have to be calculated every time. This extra work leads to loosing advantage in performance comapred to the Points format.
+The frame format gears to the time aspect of trajectory data. So it suits best when queries are about the continuous points within a time frame. For our example use case, we are rather interested in specific points in time or aggregated information about a timespan. Therefore, before the data has the desired format to work with, some additional steps always have to be calculated every time. This extra work leads to loosing advantage in performance comapred to the point format.
 
-For location specific queries like those in our sample application, the Points format suits well, because most times no furthermore calculations are necessary to query the data properly.
+For location specific queries like those in our sample application, the point format suits well, because most times no furthermore calculations are necessary to query the data properly.
 
-The Key-Value format does not at all fit a column-based database, because for every query almost the entire table has to be loaded and parsed in the application before any selection is possible. Also, the maximum bounding rectangle and start as well as end time in separate columns were not helpful in our specific case, as our every entry of our dataset coverd very a similar time and spacial span. This format should be implemented in a document store database for a appropriate evaluation.
+The key-value format does not at all fit a column-based database, because for every query almost the entire table has to be loaded and parsed in the application before any selection is possible. Also, the maximum bounding rectangle and start as well as end time in separate columns were not helpful in our specific case, as every entry of our dataset covered a very similar time and spacial span. This format should be implemented in a document store database for a appropriate evaluation.
 
-In the end it strongly depends on a concrete use case which data laout to use and how to optimize it. Furthermore, for each use case, the tradeoff between memory usage and performance has to be found.
+In the end it strongly depends on a concrete use case which data layout to use and how to optimize it. Furthermore, for each use case, the tradeoff between memory usage and performance has to be found.
 
 We experienced that SAP HANA as our columnar in-memory database is very fast in calculations and aggregations. It also has good compression rates. Especially for our use case, data modification and operations on timestamps were necessary, which we found out to be rather slow. Nevertheless, this can partly be overcome by some of our optimizations.
 
