@@ -336,7 +336,7 @@ For our heatmap is necessary to get all taxis within a specific time frame. With
 
 For the Points format all entries simply are filtered by their timestamp to be within the given period and, depending on the desired granilarity, rounded to a different amount of decimals. Afterwards the results are grouped by latitude and longitude to get the weight. This takes about 19 milliseconds.
 
-As the Frame format is geared to such time frames it should be much faster to get all points within a frame. With 14 milliseconds it is faster than the Points format, but only by a small amount. The reason for that is the delta encoding for all but the first coordinate within a frame. So for each found entry the coordinate needs to be calculated. After this is done, rounding the coordinates according to the granulatrity and grouping to get a weight is the same as for the Points format.
+As the Frame format is geared to such time frames it should be much faster to get all points within a frame. Figure \ref{fig:bench_whole_trajectory} shows that with 14 milliseconds it is faster than the Points format, but only by a small amount. The reason for that is the delta encoding for all but the first coordinate within a frame. So for each found entry the coordinate needs to be calculated. After this is done, rounding the coordinates according to the granulatrity and grouping to get a weight is the same as for the Points format.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.48\textwidth]{img/bench_single_frame.png}
