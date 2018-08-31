@@ -366,6 +366,13 @@ One successful optimization was to store time as seconds instead of timestamps. 
 \end{figure}
 
 \subsubsection{Get taxis in time and range boundary}
+We wanted to find out how these last two optimizations perform on a more complex query of a realistic scenario: retrieving all taxis within a defined time period and geografic bounding rectangle. We implemented this rather complex statement as prcedure for easy usage. Figure \ref{fig:bench_time_range_boundary} shows that the execution time of the multiple columns approach dramatically exceeds the single column approach with increasing number of results.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.48\textwidth]{img/bench_time_range_boundary.png}
+  \caption{Time in ms required for filtering by coordinates and time}
+  \label{fig:bench_time_range_boundary}
+\end{figure}
 
 \section{Conclusion}
 
