@@ -257,7 +257,7 @@ A third storage layout we evaluated is the key-value format. Therefore, we decid
 
 \subsubsection{Sample point format}
 
-Since the data neither changes nor grows anymore, we decided to store the information in sorted order. As sorting key we utilized the trajectory identifier and the timestamp. In order to speed up window queries we materialized a unique identifier, which is the row ID. This ID simplifies the creation of a primary key. Otherwise, a primary key would have to include multiple columns, most likely all of them. The Hana database automatically creates an index on this column. Furthermore, we realized that timestamp operations perform relatively bad. In order to avoid timestamps we calculate the amount of seconds lasted and store those as an integer in the database. The speed improvement of this optimization will be examined in the next section (see section \ref{sec:bench_ts}).
+Since the data neither changes nor grows anymore, we decided to store the information in sorted order. As sorting key we utilized the trajectory identifier and the timestamp. In order to speed up window queries we materialized a unique identifier, which is the row ID. This ID simplifies the creation of a primary key. Otherwise, a primary key would have to include multiple columns, most likely all of them. The Hana database automatically creates an index on this column. Furthermore, we realized that timestamp operations perform relatively bad. In order to avoid timestamps we calculate the amount of seconds lasted and store those as an integer in the database.
 
 \subsubsection{Frame format}
 Wang et al.~\cite{wang} have chosen a frame size of 30 seconds. In our opinion, this interval is relatively large. As presented in section \ref{sec:ds} the median frequency of data points is 15 seconds. Therefore, we adopted the frame size. By changing this value, the frame group size increases as well. This would lead to having 484 columns in the frame format table. Querying data becomes an error-prone task. Thus, we decreased the frame group size to ten minutes.
@@ -270,10 +270,6 @@ Our application executes several SQL statements. In order to improve their speed
 \subsection{Application specific benchmarks}
 In this section we present the benchmark results of the queries directly related to our application.
 
-\subsubsection{timestamps}
-\label{sec:bench_ts}
-% Ich würde hierzu gerne noch nen Benchmark erstellen
-
 \subsubsection{Get whole trajectory}
 In various situations we need to have a whole in hand. Therefore, we wrote SQL queries for each storage layout. The query execution times are shown in graphic \ref{fig:bench_whole_trajectory}. In order to create the statistics we ran the queries 100 times. The time is measured within our python server and encoompasses the whole recreation. Network latency between the server and the database has not been measured. Hence, it is not part of the benchmark.
 
@@ -282,7 +278,6 @@ The slowest query execution time feature the sample point format. However, the d
 Recreating a trajectory in the frame format is faster in terms of retrieving the data from the database. However, in order to calculate the correct GPS coordinates there is a computation overhead. We have done this in the python backend. An attempt of recreating the data via an SQL procedure using dynamic SQL failed due to extraordinary execution times. This takes 89.3 seconds, which is a performance decrease by factor 4000. An explanation for the high number could be, that dynamic SQL cannot be optimized well by the DBMS and runs in a single threaded style. The frame layout having a frame size of 15 seconds almost takes double the time as the frame size of 30 seconds. The reason for that, is the double amount of data.
 
 The fastest approach of trajectory recreation is the key-value format with an execution time of 9.5 microseconds. Querying the database becomes the fastest part, because only a single field is required. A huge amount of time is consumed by parsing the JSON string and creating a JSON object. Parsing the string within an SQL command does not represent an option for us, since this way is to error-prone.
-
 
 \begin{figure}[ht]
 \centering
@@ -293,6 +288,24 @@ The fastest approach of trajectory recreation is the key-value format with an ex
 
 
 \subsubsection{Calculate distances}
+A key functionality of our software is the calculation of the profit per taxi. Therefore, we take three different factors into account:
+\begin{enumerate}
+    \item Taxi start: As soon as a passenger enters a taxi, he or she has to pay 11 Yuan
+    \item Waiting time: There are several reasons why a vehicle has to wait (e.g. for the passenger). We assume, that this time is approxiamtely 10 percent of the ride. An hour of waiting time costs 48 Yuan.
+    \item Distance driven: The price of a ride depends on the distance. A typical value is 2.40 Yuan in the city of Shenzhen.
+\end{enumerate}
+% Die Werte haben sich schon geändert ;)
+The prices used for calculation are taken from a website.\footnote{\href{https://www.numbeo.com/taxi-fare/country\_result.jsp?country=China}{https://www.numbeo.com/taxi-fare/country\_result.jsp?country=China}} The values might have changed until now. However, prices will not change in a way, that our calculations become fundamentally wrong.
+
+The calculation of aspect one and two is trivial since these are only simple additions or multiplication. Determining the distance is a more complex part, that we want to describe in detail now.
+
+To calculate the distance we demand to do it completely in the database. When querying a full trajectory we have to use the sample point format, since any other layout depends on the python backend.
+
+The simplest way to get the distance of a ride is the usage of spatial points (\textit{ST_POINTS}). This is a data type implemented in SAP Hana, that can be created out of a longitude and a latitude value. Furthermore, there is a function to compute the distance between those points. A single ride starts, when a passenger enters a taxi (occupancy changes from zero to one) and ends, when the passenger leaves (occupancy changes from one to zero). We sum up the lengths between all points sum uo all values for a whole trajectory.
+
+We performed a first run on the original unoptimized table. This takes more than eight minutes. A query execution of such a high duration is far away from real time calculation and 
+
+% To be continued
 
 \subsubsection{Get points from timeframe}
 
