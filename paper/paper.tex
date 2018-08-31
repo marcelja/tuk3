@@ -301,7 +301,7 @@ The calculation of aspect one and two is trivial since these are only simple add
 
 To calculate the distance we demand to do it completely in the database. When querying a full trajectory we have to use the sample point format, since any other layout depends on the python backend.
 
-The simplest way to get the distance of a ride is the usage of spatial points (\textit{ST_POINTS}). This is a data type implemented in SAP Hana, that can be created out of a longitude and a latitude value. Furthermore, there is a function to compute the distance between those points. A single ride starts, when a passenger enters a taxi (occupancy changes from zero to one) and ends, when the passenger leaves (occupancy changes from one to zero). We sum up the lengths between all points sum uo all values for a whole trajectory.
+The simplest way to get the distance of a ride is the usage of spatial points (\textit{ST\_POINTS}). This is a data type implemented in SAP Hana, that can be created out of a longitude and a latitude value. Furthermore, there is a function to compute the distance between those points. A single ride starts, when a passenger enters a taxi (occupancy changes from zero to one) and ends, when the passenger leaves (occupancy changes from one to zero). We sum up the lengths between all points sum uo all values for a whole trajectory.
 
 We performed a first run on the original unoptimized table. This takes more than eight minutes. A query execution of such a high duration is far away from real time calculation and 
 
