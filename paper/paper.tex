@@ -275,6 +275,22 @@ In this section we present the benchmark results of the queries directly related
 % Ich würde hierzu gerne noch nen Benchmark erstellen
 
 \subsubsection{Get whole trajectory}
+In various situations we need to have a whole in hand. Therefore, we wrote SQL queries for each storage layout. The query execution times are shown in graphic \ref{fig:bench_whole_trajectory}. In order to create the statistics we ran the queries 100 times. The time is measured within our python server and encoompasses the whole recreation. Network latency between the server and the database has not been measured. Hence, it is not part of the benchmark.
+
+The slowest query execution time feature the sample point format. However, the data retrieved from the database does not need to be recreated in the python backend. It can be used as it is.
+
+Recreating a trajectory in the frame format is faster in terms of retrieving the data from the database. However, in order to calculate the correct GPS coordinates there is a computation overhead. We have done this in the python backend. An attempt of recreating the data via an SQL procedure using dynamic SQL failed due to extraordinary execution times. This takes 89.3 seconds, which is a performance decrease by factor 4000. An explanation for the high number could be, that dynamic SQL cannot be optimized well by the DBMS and runs in a single threaded style. The frame layout having a frame size of 15 seconds almost takes double the time as the frame size of 30 seconds. The reason for that, is the double amount of data.
+
+The fastest approach of trajectory recreation is the key-value format with an execution time of 9.5 microseconds. Querying the database becomes the fastest part, because only a single field is required. A huge amount of time is consumed by parsing the JSON string and creating a JSON object. Parsing the string within an SQL command does not represent an option for us, since this way is to error-prone.
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.48\textwidth]{img/bench_whole_trajectory.png}
+\caption{Time required for retrieving one trajectory}
+\label{fig:bench_whole_trajectory}
+\end{figure}
+
 
 \subsubsection{Calculate distances}
 
