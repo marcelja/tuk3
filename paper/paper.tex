@@ -321,9 +321,15 @@ To calculate the distance we demand to do it completely in the database. When qu
 
 The simplest way to get the distance of a ride is the usage of spatial points (\textit{ST\_POINTS}). This is a data type implemented in SAP Hana, that can be created out of a longitude and a latitude value. Furthermore, there is a function to compute the distance between those points. A single ride starts, when a passenger enters a taxi (occupancy changes from zero to one) and ends, when the passenger leaves (occupancy changes from one to zero). We sum up the lengths between all points sum uo all values for a whole trajectory.
 
-We performed a first run on the original unoptimized table. This takes more than eight minutes. A query execution of such a high duration is far away from real time calculation and 
+We performed a first run on the original unoptimized table. This takes more than eight minutes. A query execution of such a high duration is far away from real time calculation. Luckily, we have an improved table. However, the query execution time still takes 198 seconds, which is way to high. When looking into the query plan, we immediately see that the conversion of longitude and latitude to ST\_POINTS takes a tremendous amount of time (roughly 133 seconds). We then materialized the ST\_POINTS. The query now runs within 65 seconds. Compared to the eight minutes of the initial approach this result sounds great. Anyway, this duration is still too high to calculate the distances on demand.
 
-% To be continued
+Once again, a look into the query plan clarifies the problem. Almost 70 percent of the time is spent in determining the displacement between the points. When using ST\_POINTS the use of st\_distance cannot be avoided. Another alternative we considered is the implementation of an own method to compute the distances. The haversine formula seems to be well suited for our purpose. It determines the displacement of two points on a spherical object. The formula is defined as follows:
+
+\begin{equation} a = sin^2(\frac{\Delta_{lat}}{2}) + cos(lat_1) \cdot sin^2(\frac{\Delta_{lon}}{2}) \end{equation}
+\begin{equation} c = 2 \cdot atan2(\sqrt{a}, \sqrt{1 - a}) \end{equation}
+\begin{equation} d = R \cdot c \end{equation}
+
+where $lat$ is the latitude, $lon$ the longitude and R the Earth's radius, which is 6,367,000 meters. Since the radius depends on the location on the Earth, we assume a slight deviation. The standard deviation is 95 meters respectively 0.04 percent compared to the results of st\_distance. Indeed, the query execution time reduces to 7.6 seconds. This is a speed up of factor 8.5 . With this solution a calculation on demand becomes possible.
 
 \subsubsection{Get points from timeframe}
 
