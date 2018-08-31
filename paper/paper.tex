@@ -332,6 +332,17 @@ Once again, a look into the query plan clarifies the problem. Almost 70 percent 
 where $lat$ is the latitude, $lon$ the longitude and R the Earth's radius, which is 6,367,000 meters. Since the radius depends on the location on the Earth, we assume a slight deviation. The standard deviation is 95 meters respectively 0.04 percent compared to the results of st\_distance. Indeed, the query execution time reduces to 7.6 seconds. This is a speed up of factor 8.5 . With this solution a calculation on demand becomes possible.
 
 \subsubsection{Get points from timeframe}
+For our heatmap is necessary to get all taxis within a specific time frame. With every returned GPS point the heatmap also gets a weight which indicates the number of taxis there. It is also possible to change the granularity of those GPS points. We did not implement this task for the Key-Value format, because the overhead of parsing the large string as JSON object before any further operations can be performed is too much.
+
+For the Points format all entries simply are filtered by their timestamp to be within the given period and, depending on the desired granilarity, rounded to a different amount of decimals. Afterwards the results are grouped by latitude and longitude to get the weight. This takes about 19 milliseconds.
+
+As the Frame format is geared to such time frames it should be much faster to get all points within a frame. With 14 milliseconds it is faster than the Points format, but only by a small amount. The reason for that is the delta encoding for all but the first coordinate within a frame. So for each found entry the coordinate needs to be calculated. After this is done, rounding the coordinates according to the granulatrity and grouping to get a weight is the same as for the Points format.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.48\textwidth]{img/bench_single_frame.png}
+  \caption{Time in ms required for retrieving one single time frame}
+  \label{fig:bench_whole_trajectory}
+\end{figure}
 
 \subsection{Application independent benchmarks}
 We tried to improve the SQL statement performance on many ways. Sometimes our anticipated improvements did not occur. Nevertheless, we want to present those failed optimizations. We also ran queries not related to our application, because we want to have a broader comparison between the different layouts.
