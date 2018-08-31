@@ -139,12 +139,30 @@ In some cases the amount of jumps is enormously high. In such cases, we delete t
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{img/more_jumps.png}
-\caption{Trajectory \textit{} having more than 2,000 jumps}
+\caption{Trajectory \textit{32,079} having more than 2,000 jumps}
 \label{fig:more_jumps}
 \end{figure}
 
 \subsubsection{Summary: Data cleansing}
 All in all we removed more than eight Million records ($\approx 18\%$) and more than 4,134 trajectories ($28\%$) due to our data cleansing rules. Most of the criteria are chosen generously to avoid deleting false positives. Additionally, there might be other aspects to improve data quality. Since this was not the focus of our work, we decided not to go further into detail.
+
+
+The following graphics depict the amount of records deleted (see figure \ref{fig:records_deleted}) and the amount of completely removed trajectories (see figure \ref{fig:trajectories_deleted}). The quantities are not disjoint amongst the data cleansing steps. In other words, a record or trajectory can occur in multiple sets. Otherwise, the numbers would depend on the order the data cleansing steps were made.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/records_deleted.png}
+\caption{Amount of records deleted per data cleansing step}
+\label{fig:records_deleted}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{img/trajectories_deleted.png}
+\caption{Amount of trajectories deleted per data cleansing step}
+\label{fig:trajectories_deleted}
+\end{figure}
 
 \section{Application Prototype}
 
@@ -290,7 +308,7 @@ The fastest approach of trajectory recreation is the key-value format with an ex
 \subsubsection{Calculate distances}
 A key functionality of our software is the calculation of the profit per taxi. Therefore, we take three different factors into account:
 \begin{enumerate}
-    \item Taxi start: As soon as a passenger enters a taxi, he or she has to pay 11 Yuan
+    \item Taxi start: As soon as a passenger enters a taxi, he or she has to pay 11 Yuan.
     \item Waiting time: There are several reasons why a vehicle has to wait (e.g. for the passenger). We assume, that this time is approxiamtely 10 percent of the ride. An hour of waiting time costs 48 Yuan.
     \item Distance driven: The price of a ride depends on the distance. A typical value is 2.40 Yuan in the city of Shenzhen.
 \end{enumerate}
