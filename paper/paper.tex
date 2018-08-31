@@ -347,6 +347,26 @@ As the Frame format is geared to such time frames it should be much faster to ge
 \subsection{Application independent benchmarks}
 We tried to improve the SQL statement performance on many ways. Sometimes our anticipated improvements did not occur. Nevertheless, we want to present those failed optimizations. We also ran queries not related to our application, because we want to have a broader comparison between the different layouts.
 
+\subsubsection{Storing floats as two integers}
+Floating point operations tend to be slower than integer operations. We split up each float column for latitude and longitude into two integer columns with the intention to speed up calculations. For the test we filtered all entries to be within a given bounding rectangle. In fact, this aproach more than doubled the processing time of the query for multiple integer columns compared to the single float ones as depicted in Figure \ref{fig:bench_coordinates_as_int}.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.48\textwidth]{img/bench_coordinates_as_int.png}
+  \caption{Time in ms filtering by coordinates}
+  \label{fig:bench_coordinates_as_int}
+\end{figure}
+
+\subsubsection{Storing time in multiple columns}
+One successful optimization was to store time as seconds instead of timestamps. But when filtering by time often the hours, minutes or seconds part of a time data point is important. With that in mind, we stored the timestamps in three colums for the hour, minutes and seconds part with the purpose of better access and faster filtering. However, as illustrated in Figure \ref{fig:bench_time_as_multiple_ints} our measurements showed that filtering by time became three times slower than with just using seconds.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.48\textwidth]{img/bench_time_as_multiple_ints.png}
+  \caption{Time in ms required for filtering by time}
+  \label{fig:bench_time_as_multiple_ints}
+\end{figure}
+
+\subsubsection{Get taxis in time and range boundary}
+
 \section{Conclusion}
 
 % \bibliographystyle{ACM-Reference-Format}
